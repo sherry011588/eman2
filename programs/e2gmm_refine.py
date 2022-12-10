@@ -317,8 +317,8 @@ def set_indices_boxsz(boxsz, apix=0, return_freq=False):
 def build_encoder(mid=512, nout=4, conv=False, ninp=-1):
 	l2=tf.keras.regularizers.l2(1e-3)
 	l1=tf.keras.regularizers.l1(1e-3)
-	kinit=tf.keras.initializers.RandomNormal(0,0.001)	# was 0.01
-	
+	#kinit=tf.keras.initializers.RandomNormal(0,0.001)	# was 0.01
+	kinit=tf.keras.initializers.HeNormal()
 	if conv:
 		ss=64
 		layers=[
@@ -380,7 +380,8 @@ def build_decoder(pts, mid=512, ninp=4, conv=False):
 	
 	x0=tf.keras.Input(shape=(ninp))
 	
-	kinit=tf.keras.initializers.RandomNormal(0,1e-2)
+	#kinit=tf.keras.initializers.RandomNormal(0,1e-2)
+	kinit=tf.keras.initializers.HeNormal()
 	l2=tf.keras.regularizers.l2(1e-3)
 	l1=tf.keras.regularizers.l1(1e-3)
 	layer_output=tf.keras.layers.Dense(npt*5, kernel_initializer=kinit, activation="sigmoid",use_bias=True)
