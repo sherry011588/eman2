@@ -345,7 +345,7 @@ def build_encoder(mid=512, nout=4, conv=False, ninp=-1):
 		x = tf.keras.layers.Flatten()(x)
 		x = tf.keras.layers.Dropout(.1)(x)
 		x = tf.keras.layers.BatchNormalization()(x)
-		outputs = tf.keras.layers.Dense(nout, kernel_initializer=kinit)(x)
+		x = tf.keras.layers.Dense(nout, kernel_initializer=kinit)(x)
 
 	elif ninp<0:
 		layers=[
@@ -375,8 +375,8 @@ def build_encoder(mid=512, nout=4, conv=False, ninp=-1):
 		tf.keras.layers.Dense(nout, kernel_regularizer=l2, kernel_initializer=kinit,use_bias=True),
 		]
 		
-	z_mean = tf.keras.layers.Dense(nout, name="z_mean")
-	z_log_var = tf.keras.layers.Dense(nout, name="z_log_var")
+	z_mean = tf.keras.layers.Dense(nout, name="z_mean")(x)
+	z_log_var = tf.keras.layers.Dense(nout, name="z_log_var")(x)
 	z = Sampling()([z_mean, z_log_var])
 	#encode_model=tf.keras.Sequential(layers)
 	encode_model= keras.Model(inputs, [z_mean, z_log_var, z], name="encoder")
