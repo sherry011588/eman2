@@ -315,7 +315,7 @@ def set_indices_boxsz(boxsz, apix=0, return_freq=False):
 		return params
 
 
-class Sampling(layers.Layer):
+class Sampling(tf.keras.layers.Layer):
 	"""Uses (z_mean, z_log_var) to sample z, the vector encoding a digit."""
 
 	def call(self, inputs):
