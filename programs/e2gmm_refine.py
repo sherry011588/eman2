@@ -314,6 +314,18 @@ def set_indices_boxsz(boxsz, apix=0, return_freq=False):
 		params={"sz":sz, "idxft":idxft, "rrft":rrft, "rings":rings}
 		return params
 
+
+class Sampling(keras.layers.Layer):
+	"""Uses (z_mean, z_log_var) to sample z, the vector encoding a digit."""
+
+	def call(self, inputs):
+		z_mean, z_log_var = inputs
+		batch = tf.shape(z_mean)[0]
+		dim = tf.shape(z_mean)[1]
+		epsilon = tf.keras.backend.random_normal(shape=(batch, dim))
+		return z_mean + tf.exp(0.5 * z_log_var) * epsilon
+
+
 def build_encoder(mid=512, nout=4, conv=False, ninp=-1):
 	l2=tf.keras.regularizers.l2(1e-3)
 	l1=tf.keras.regularizers.l1(1e-3)
@@ -321,20 +333,20 @@ def build_encoder(mid=512, nout=4, conv=False, ninp=-1):
 	kinit=tf.keras.initializers.HeNormal()
 	if conv:
 		ss=64
-		layers=[
-			tf.keras.layers.Flatten(),
-			tf.keras.layers.Dense(ss*ss, kernel_regularizer=l2),
-			tf.keras.layers.Reshape((ss,ss,1)),
-			
-			tf.keras.layers.Conv2D(4, 5, activation="relu", strides=(2,2), padding="same"),
-			tf.keras.layers.Conv2D(8, 5, activation="relu", strides=(2,2), padding="same"),
-			tf.keras.layers.Conv2D(16, 3, activation="relu", strides=(2,2), padding="same"),
-			tf.keras.layers.Conv2D(16, 3, activation="relu", strides=(2,2), padding="same"),
-			tf.keras.layers.Flatten(),
-			tf.keras.layers.Dropout(.1),
-			tf.keras.layers.BatchNormalization(),
-			tf.keras.layers.Dense(nout, kernel_initializer=kinit),
-		]
+		inputs = tf.keras.Input(shape=(ss,ss,1))
+		x = tf.keras.layers.Flatten()(inputs)
+		x = tf.keras.layers.Dense(ss*ss, kernel_regularizer=l2)(x)
+		x = tf.keras.layers.Reshape((ss, ss, 1))(x)
+
+		x = tf.keras.layers.Conv2D(4, 5, activation="relu", strides=(2,2), padding="same")(x)
+		x = tf.keras.layers.Conv2D(8, 5, activation="relu", strides=(2,2), padding="same")(x)
+		x = tf.keras.layers.Conv2D(16, 3, activation="relu", strides=(2,2), padding="same")(x)
+		x = tf.keras.layers.Conv2D(16, 3, activation="relu", strides=(2,2), padding="same")(x)
+		x = tf.keras.layers.Flatten()(x)
+		x = tf.keras.layers.Dropout(.1)(x)
+		x = tf.keras.layers.BatchNormalization()(x)
+		outputs = tf.keras.layers.Dense(nout, kernel_initializer=kinit)(x)
+
 	elif ninp<0:
 		layers=[
 		tf.keras.layers.Flatten(),
@@ -363,7 +375,11 @@ def build_encoder(mid=512, nout=4, conv=False, ninp=-1):
 		tf.keras.layers.Dense(nout, kernel_regularizer=l2, kernel_initializer=kinit,use_bias=True),
 		]
 		
-	encode_model=tf.keras.Sequential(layers)
+	z_mean = tf.keras.layers.Dense(nout, name="z_mean")
+	z_log_var = tf.keras.layers.Dense(nout, name="z_log_var")
+	z = Sampling()([z_mean, z_log_var])
+	#encode_model=tf.keras.Sequential(layers)
+	encode_model= keras.Model(inputs, [z_mean, z_log_var, z], name="encoder")
 	return encode_model
 
 #### build decoder network. 
