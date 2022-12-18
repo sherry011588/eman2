@@ -331,7 +331,7 @@ def build_encoder(mid=512, nout=4, conv=False, ninp=-1):
 	l1=tf.keras.regularizers.l1(1e-3)
 	#kinit=tf.keras.initializers.RandomNormal(0,0.001)	# was 0.01
 	kinit=tf.keras.initializers.HeNormal()
-	inputs=tf.keras.Input(shape=(ninp))
+	inputs=tf.keras.Input(shape=(32, 1580, 5))
 	
 	if conv:
 		ss=64
