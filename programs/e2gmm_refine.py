@@ -903,6 +903,14 @@ def main():
 		gen_model=build_decoder(pts+rnd, ninp=options.nmid, conv=options.conv,mid=options.ndense)
 		print("{} gaussian in the model".format(len(pts)))
 		
+		#D_KL
+		D_KL = -0.5 * tf.math.reduce_sum(1+z_log_var -tf.math.exp(z_log_var )-tf.math.square(z_mean),axis=1)
+
+		latent_loss = tf.math.reduce_mean(D_KL) / 784.0
+
+		gen_model.add_loss(latent_loss)
+		
+		
 		## train the model from coordinates first
 		conf=tf.zeros((1,options.nmid), dtype=floattype)
 		opt=tf.keras.optimizers.Adam(learning_rate=1e-4) 
