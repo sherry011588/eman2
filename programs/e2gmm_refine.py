@@ -379,7 +379,7 @@ def build_encoder(mid=512, nout=4, conv=False, ninp=-1):
 	z_log_var = tf.keras.layers.Dense(nout, name="z_log_var")(x)
 	z = Sampling()([z_mean, z_log_var])
 	#encode_model=tf.keras.Sequential(layers)
-	encode_model= keras.Model(inputs, [z_mean, z_log_var, z], name="encoder")
+	encode_model= tf.keras.Model(inputs, [z_mean, z_log_var, z], name="encoder")
 	return encode_model
 
 #### build decoder network. 
