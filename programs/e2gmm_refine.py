@@ -333,19 +333,20 @@ def build_encoder(mid=512, nout=4, conv=False, ninp=-1):
 	kinit=tf.keras.initializers.HeNormal()
 	if conv:
 		ss=64
-		#inputs = tf.keras.Input(shape=(ss,ss,1))
-		x = tf.keras.layers.Flatten()
-		x = tf.keras.layers.Dense(ss*ss, kernel_regularizer=l2)(x)
-		x = tf.keras.layers.Reshape((ss, ss, 1))(x)
-
-		x = tf.keras.layers.Conv2D(4, 5, activation="relu", strides=(2,2), padding="same")(x)
-		x = tf.keras.layers.Conv2D(8, 5, activation="relu", strides=(2,2), padding="same")(x)
-		x = tf.keras.layers.Conv2D(16, 3, activation="relu", strides=(2,2), padding="same")(x)
-		x = tf.keras.layers.Conv2D(16, 3, activation="relu", strides=(2,2), padding="same")(x)
-		x = tf.keras.layers.Flatten()(x)
-		x = tf.keras.layers.Dropout(.1)(x)
-		x = tf.keras.layers.BatchNormalization()(x)
-		x = tf.keras.layers.Dense(nout, kernel_initializer=kinit)(x)
+		layers=[
+		tf.keras.layers.Flatten(),
+		tf.keras.layers.Dense(ss*ss, kernel_regularizer=l2),
+		tf.keras.layers.Reshape((ss,ss,1)),
+			
+		tf.keras.layers.Conv2D(4, 5, activation="relu", strides=(2,2), padding="same"),
+		tf.keras.layers.Conv2D(8, 5, activation="relu", strides=(2,2), padding="same"),
+		tf.keras.layers.Conv2D(16, 3, activation="relu", strides=(2,2), padding="same"),
+		tf.keras.layers.Conv2D(16, 3, activation="relu", strides=(2,2), padding="same"),
+		tf.keras.layers.Flatten(),
+		tf.keras.layers.Dropout(.1),
+		tf.keras.layers.BatchNormalization(),
+		tf.keras.layers.Dense(nout, kernel_initializer=kinit),
+		]
 
 	elif ninp<0:
 		layers=[
@@ -375,11 +376,11 @@ def build_encoder(mid=512, nout=4, conv=False, ninp=-1):
 		tf.keras.layers.Dense(nout, kernel_regularizer=l2, kernel_initializer=kinit,use_bias=True),
 		]
 		
-	z_mean = tf.keras.layers.Dense(nout, name="z_mean")(x)
-	z_log_var = tf.keras.layers.Dense(nout, name="z_log_var")(x)
+	z_mean = tf.keras.layers.Dense(nout, name="z_mean")(layers)
+	z_log_var = tf.keras.layers.Dense(nout, name="z_log_var")(layers)
 	z = Sampling()([z_mean, z_log_var])
-	#encode_model=tf.keras.Sequential(layers)
-	encode_model= tf.keras.Model(inputs, [z_mean, z_log_var, z], name="encoder")
+	encode_model=tf.keras.Sequential(z)
+	#encode_model= tf.keras.Model(inputs, [z_mean, z_log_var, z], name="encoder")
 	return encode_model
 
 #### build decoder network. 
