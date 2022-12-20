@@ -336,6 +336,7 @@ def build_encoder(mid=512, nout=4, conv=False, ninp=-1):
 	if conv:
 		ss=64
 		x = tf.keras.layers.Flatten()(inputs)
+		x = tf.keras.layers.Flatten()(inputs)
 		x = tf.keras.layers.Dense(ss*ss, kernel_regularizer=l2)(x)
 		x = tf.keras.layers.Reshape((ss, ss, 1))(x)
 
