@@ -786,6 +786,13 @@ def train_heterg(trainset, pts, encode_model, decode_model, params, options):
 				if options.modelreg>0: 
 					loss+=tf.reduce_sum((pout[:,:,:3]-pts[:,:,:3])**2)/len(pts)/xf.shape[0]*options.modelreg
 			
+					#################D_KL
+					D_KL = -0.5 * (1+z_log_var -tf.math.exp(z_log_var)-z_mean**2)
+					
+					D_KL = tf.math.reduce_sum(D_KL) /xf.shape[0]*options.modelreg
+					loss = loss + 1.*D_KL
+					######################
+			
 			cost.append(loss)
 			grad=gt.gradient(loss, wts)
 			opt.apply_gradients(zip(grad, wts))
@@ -912,12 +919,6 @@ def main():
 		gen_model=build_decoder(pts+rnd, ninp=options.nmid, conv=options.conv,mid=options.ndense)
 		print("{} gaussian in the model".format(len(pts)))
 		
-		#D_KL
-		D_KL = -0.5 * tf.math.reduce_sum(1+z_log_var -tf.math.exp(z_log_var )-tf.math.square(z_mean),axis=1)
-
-		latent_loss = tf.math.reduce_mean(D_KL) / 784.0
-
-		gen_model.add_loss(latent_loss)
 		
 		
 		## train the model from coordinates first
