@@ -786,12 +786,12 @@ def train_heterg(trainset, pts, encode_model, decode_model, params, options):
 				if options.modelreg>0: 
 					loss+=tf.reduce_sum((pout[:,:,:3]-pts[:,:,:3])**2)/len(pts)/xf.shape[0]*options.modelreg
 			
-					#################D_KL
-					D_KL = -0.5 * (1+z_log_var -tf.math.exp(z_log_var)-z_mean**2)
-					
-					D_KL = tf.math.reduce_sum(D_KL) /xf.shape[0]*options.modelreg
-					loss = loss + 1.*D_KL
-					######################
+				#################D_KL
+				D_KL = -0.5 * (1+z_log_var -tf.math.exp(z_log_var)-z_mean**2)
+				
+				D_KL = tf.math.reduce_sum(D_KL) /xf.shape[0]*options.modelreg
+				loss = loss + 1.*D_KL
+				######################
 			
 			cost.append(loss)
 			grad=gt.gradient(loss, wts)
