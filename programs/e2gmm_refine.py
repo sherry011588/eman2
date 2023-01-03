@@ -377,11 +377,7 @@ def build_encoder(mid=512, nout=4, conv=False, ninp=-1):
 		tf.keras.layers.Dense(nout, kernel_regularizer=l2, kernel_initializer=kinit,use_bias=True),
 		]
 		
-	#z_mean = tf.keras.layers.Dense(nout, name="z_mean")(x)
-	#z_log_var = tf.keras.layers.Dense(nout, name="z_log_var")(x)
-	#z = Sampling()([z_mean, z_log_var])
 	encode_model=tf.keras.Sequential(layers)
-	#encode_model= tf.keras.Model(inputs,z, name="encoder")
 	return encode_model
 
 #### build decoder network. 
@@ -758,9 +754,9 @@ def train_heterg(trainset, pts, encode_model, decode_model, params, options):
 				cl=tf.reduce_mean(tf.maximum(cl-1,0))
 				
 				##add mean log var  ninp=options.nmid 
-				z_mean = tf.keras.layers.Dense(options.nmid, name="z_mean")(conf)
-				z_log_var = tf.keras.layers.Dense(options.nmid, name="z_log_var")(conf)
-				conf = Sampling()([z_mean, z_log_var])
+				#z_mean = tf.keras.layers.Dense(options.nmid, name="z_mean")(conf)
+				#z_log_var = tf.keras.layers.Dense(options.nmid, name="z_log_var")(conf)
+				#conf = Sampling()([z_mean, z_log_var])
 				
 				
 				## perturb the conformation by a random value
@@ -768,7 +764,7 @@ def train_heterg(trainset, pts, encode_model, decode_model, params, options):
 				## but we do not train the sigma of the random value here
 				## since we control the radius of latent space already, this seems enough
                 
-				#conf=options.perturb*tf.random.normal(conf.shape)+conf
+				conf=options.perturb*tf.random.normal(conf.shape)+conf
                 
 				# 0.1 is a pretty big perturbation for this range, maybe responsible for the random churn in the models? --steve
 				#conf=.1*tf.random.normal(conf.shape)+conf
@@ -798,12 +794,7 @@ def train_heterg(trainset, pts, encode_model, decode_model, params, options):
 				#D_KL = tf.math.reduce_mean(D_KL) /xf.shape[0]*options.modelreg
 				#loss = loss + 1.*D_KL
 				######################
-				#################D_KL
-				D_KL = -0.5 * tf.math.reduce_sum(1+z_log_var -tf.math.exp(z_log_var)-z_mean**2)
 				
-				#D_KL = tf.math.reduce_mean(D_KL) /xf.shape[0]*options.modelreg
-				loss = loss + 1.*D_KL
-				######################
 			
 			cost.append(loss)
 			grad=gt.gradient(loss, wts)
