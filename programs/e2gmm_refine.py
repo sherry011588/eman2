@@ -750,13 +750,13 @@ def train_heterg(trainset, pts, encode_model, decode_model, params, options):
 				## regularization of the latent layer range
 				## ideally the output is within a 1-radius circle
 				## but we want to make the contraint more soft so it won't affect convergence
-				cl=tf.math.sqrt(tf.reduce_sum(conf**2, axis=1))
-				cl=tf.reduce_mean(tf.maximum(cl-1,0))
+				#cl=tf.math.sqrt(tf.reduce_sum(conf**2, axis=1))
+				#cl=tf.reduce_mean(tf.maximum(cl-1,0))
 				
 				##add mean log var  ninp=options.nmid 
-				#z_mean = tf.keras.layers.Dense(options.nmid, name="z_mean")(conf)
-				#z_log_var = tf.keras.layers.Dense(options.nmid, name="z_log_var")(conf)
-				#conf = Sampling()([z_mean, z_log_var])
+				z_mean = tf.keras.layers.Dense(options.nmid, name="z_mean")(conf)
+				z_log_var = tf.keras.layers.Dense(options.nmid, name="z_log_var")(conf)
+				conf = Sampling()([z_mean, z_log_var])
 				
 				
 				## perturb the conformation by a random value
@@ -764,7 +764,7 @@ def train_heterg(trainset, pts, encode_model, decode_model, params, options):
 				## but we do not train the sigma of the random value here
 				## since we control the radius of latent space already, this seems enough
                 
-				conf=options.perturb*tf.random.normal(conf.shape)+conf
+				#conf=options.perturb*tf.random.normal(conf.shape)+conf
                 
 				# 0.1 is a pretty big perturbation for this range, maybe responsible for the random churn in the models? --steve
 				#conf=.1*tf.random.normal(conf.shape)+conf
@@ -777,22 +777,19 @@ def train_heterg(trainset, pts, encode_model, decode_model, params, options):
 				## finally generate images and calculate frc
 				imgs_cpx=pts2img(pout, xf, params, sym=options.sym)
 				fval=calc_frc(pj_cpx, imgs_cpx, params["rings"])
-				loss=-tf.reduce_mean(fval)+cl*1e-2
+				#loss=-tf.reduce_mean(fval)+cl*1e-2
 				
-				if options.modelreg>0: 
-					loss+=tf.reduce_sum((pout[:,:,:3]-pts[:,:,:3])**2)/len(pts)/xf.shape[0]*options.modelreg
-			
-				#################D_KL1
-				#D_KL = -0.5 * (1+z_log_var -tf.math.exp(z_log_var)-z_mean**2)
+				#if options.modelreg>0: 
+					#loss+=tf.reduce_sum((pout[:,:,:3]-pts[:,:,:3])**2)/len(pts)/xf.shape[0]*options.modelreg
 				
-				#D_KL = tf.math.reduce_sum(D_KL) /xf.shape[0]*options.modelreg
-				#loss = loss + 1.*D_KL
-				######################
-				#################D_KL2
-				#D_KL = -0.5 * tf.math.reduce_sum(1+z_log_var -tf.math.exp(z_log_var)-z_mean**2,axis=1)
 				
-				#D_KL = tf.math.reduce_mean(D_KL) /xf.shape[0]*options.modelreg
-				#loss = loss + 1.*D_KL
+				loss = tf.reduce_mean(tf.reduce_sum(tf.keras.losses.binary_crossentropy(grd, pout), axis=(1, 2)))
+				
+				#################D_KL
+				D_KL = -0.5 * tf.math.reduce_sum(1+z_log_var -tf.math.exp(z_log_var)-z_mean**2,axis=1)
+				
+				D_KL = tf.math.reduce_mean(D_KL) /xf.shape[0]*options.modelreg
+				loss = loss + 1.*D_KL
 				######################
 				
 			
