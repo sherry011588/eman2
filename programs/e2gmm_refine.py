@@ -1083,7 +1083,7 @@ def main():
 		else:
 			decode_model=build_decoder(pts[0].numpy(), ninp=options.nmid, conv=options.conv,mid=options.ndense)
 		
-		mid=encode_model(allgrds[:bsz])
+		mid=encode_model(dcpx_out[:bsz])#allgrds
 		print("Latent space shape: ", mid.shape)
 		out=decode_model(mid)
 		print("Output shape: ",out.shape)
@@ -1094,7 +1094,7 @@ def main():
 		trainset=tf.data.Dataset.from_tensor_slices((allgrds[ptclidx], dcpx[0][ptclidx], dcpx[1][ptclidx], xfsnp[ptclidx]))
 		trainset=trainset.batch(bsz)
 		
-		train_heterg(trainset, pts, encode_model, decode_model, params, options)
+		train_heterg(dcpx,trainset, pts, encode_model, decode_model, params, options)
 		
 		if options.decoderout!=None: 
 			decode_model.save(options.decoderout)
