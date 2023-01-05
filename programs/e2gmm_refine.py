@@ -723,7 +723,7 @@ def calc_gradient(trainset, pts, params, options):
 	return allscr, allgrds
 	
 #### train the conformation manifold from particles
-def train_heterg(trainset, pts, encode_model, decode_model, params, options):
+def train_heterg(dcpx,trainset, pts, encode_model, decode_model, params, options):
 	npt=pts.shape[1]
 	pas=[int(i) for i in options.pas]
 	pas=tf.constant(np.array([pas[0],pas[0],pas[0],pas[1],pas[2]], dtype=floattype))
@@ -737,14 +737,14 @@ def train_heterg(trainset, pts, encode_model, decode_model, params, options):
 	## Training
 	allcost=[]
 	for itr in range(options.niter):
-		
+		dcpx_out=np.fft.irfft2(dcpx[0].numpy()+1j*dcpx[1].numpy())
 		i=0
 		cost=[]
-		for grd,pjr,pji,xf in trainset:
+		for pjr,pji,xf in trainset:   #grd,
 			pj_cpx=(pjr, pji)
 			with tf.GradientTape() as gt:
 				## from gradient input to the latent space
-				conf=encode_model(grd, training=True)
+				conf=encode_model(dcpx_out, training=True)
 				
 							
 				## regularization of the latent layer range
@@ -783,7 +783,7 @@ def train_heterg(trainset, pts, encode_model, decode_model, params, options):
 					#loss+=tf.reduce_sum((pout[:,:,:3]-pts[:,:,:3])**2)/len(pts)/xf.shape[0]*options.modelreg
 				
 				
-				loss = tf.reduce_mean(tf.reduce_sum(tf.keras.losses.binary_crossentropy(grd, pout),axis=1))#, axis=(1, 2)
+				loss = tf.reduce_mean(tf.reduce_sum(tf.keras.losses.binary_crossentropy(dcpx_out, pout),axis=1))#, axis=(1, 2)
 				
 				#################D_KL
 				D_KL = -0.5 * tf.math.reduce_sum(1+z_log_var -tf.math.exp(z_log_var)-z_mean**2,axis=1)
