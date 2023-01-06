@@ -1043,38 +1043,38 @@ def main():
 			
 		save_ptcls_xform(xfsnp, raw_boxsz, options, frcs)
 
-	#### Heterogeneity analysis from particles
-	bsz=options.batchsz
-	if options.ptclsin and options.heter:
-		pts=tf.constant(pts[None,:,:])
-		params=set_indices_boxsz(maxboxsz)
-		dcpx=get_clip(data_cpx, params["sz"], clipid)
-		dcpx_out=np.fft.irfft2(dcpx[0].numpy()+1j*dcpx[1].numpy())#################################################
-		#### calculate d(FRC)/d(GMM) for each particle
-		##   this will be the input for the deep network in place of the particle images
-		if options.gradin:
-			## optionally load from saved files
-			ag=EMData(options.gradin)
-			allgrds=ag.numpy().copy()
-			del ag
-			allscr=allgrds[:,0]
-			allgrds=allgrds[:,1:].reshape((len(allgrds), npt, 5))
-			print("Gradient shape: ", allgrds.shape) 
-			
-		else:
-			trainset=tf.data.Dataset.from_tensor_slices((dcpx[0], dcpx[1], xfsnp))
-			trainset=trainset.batch(bsz)
-			allscr, allgrds=calc_gradient(trainset, pts, params, options )
-			
-			## save to hdf file
-			if options.gradout:
-				allgrds=allgrds.reshape((len(allgrds),-1))
-				#dcpx_out=dcpx_out.reshape((len(dcpx_out),-1))############################################
-				print("Gradient shape: ", allgrds.shape) ############################################
-				ag=from_numpy(np.hstack([allscr[:,None], allgrds]))
-				ag.write_image(options.gradout)
-				del ag
-				allgrds=allgrds.reshape((len(allgrds), npt, 5))
+#	#### Heterogeneity analysis from particles
+#	bsz=options.batchsz
+#	if options.ptclsin and options.heter:
+#		pts=tf.constant(pts[None,:,:])
+#		params=set_indices_boxsz(maxboxsz)
+#		dcpx=get_clip(data_cpx, params["sz"], clipid)
+#		dcpx_out=np.fft.irfft2(dcpx[0].numpy()+1j*dcpx[1].numpy())#################################################
+#		#### calculate d(FRC)/d(GMM) for each particle
+#		##   this will be the input for the deep network in place of the particle images
+#		if options.gradin:
+#			## optionally load from saved files
+#			ag=EMData(options.gradin)
+#			allgrds=ag.numpy().copy()
+#			del ag
+#			allscr=allgrds[:,0]
+#			allgrds=allgrds[:,1:].reshape((len(allgrds), npt, 5))
+#			print("Gradient shape: ", allgrds.shape) 
+#			
+#		else:
+#			trainset=tf.data.Dataset.from_tensor_slices((dcpx[0], dcpx[1], xfsnp))
+#			trainset=trainset.batch(bsz)
+#			allscr, allgrds=calc_gradient(trainset, pts, params, options )
+#			
+#			## save to hdf file
+#			if options.gradout:
+#				allgrds=allgrds.reshape((len(allgrds),-1))
+#				#dcpx_out=dcpx_out.reshape((len(dcpx_out),-1))############################################
+#				print("Gradient shape: ", allgrds.shape) ############################################
+#				ag=from_numpy(np.hstack([allscr[:,None], allgrds]))
+#				ag.write_image(options.gradout)
+#				del ag
+#				allgrds=allgrds.reshape((len(allgrds), npt, 5))
 				
 		#### build deep networks and make sure they work
 		if options.encoderin:
