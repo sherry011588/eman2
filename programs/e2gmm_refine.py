@@ -746,6 +746,7 @@ def train_heterg(trainset, pts, encode_model, decode_model, params, options):
 				## from gradient input to the latent space
 				dcpx_out=np.fft.irfft2(dcpx[0].numpy()+1j*dcpx[1].numpy())
 				#dcpx_out=tf.expand_dims(dcpx_out, axis=-1)
+				dcpx_out=dcpx_out.reshape((len(dcpx_out),-1))############################################
 				conf=encode_model(dcpx_out[:options.batchsz], training=True)
 				
 							
@@ -1068,7 +1069,7 @@ def main():
 			## save to hdf file
 			if options.gradout:
 				#allgrds=allgrds.reshape((len(allgrds),-1))
-				dcpx_out=dcpx_out.reshape((len(dcpx_out),-1))
+				dcpx_out=dcpx_out.reshape((len(dcpx_out),-1))############################################
 				print("Gradient shape: ", dcpx_out.shape) ############################################
 				ag=from_numpy(np.hstack([allscr[:,None], allgrds]))
 				ag.write_image(options.gradout)
@@ -1085,7 +1086,7 @@ def main():
 			decode_model=tf.keras.models.load_model(f"{options.decoderin}",compile=False)
 		else:
 			decode_model=build_decoder(pts[0].numpy(), ninp=options.nmid, conv=options.conv,mid=options.ndense)
-		
+		dcpx_out=dcpx_out.reshape((len(dcpx_out),-1))############################################
 		mid=encode_model(dcpx_out[:bsz])############################################
 		print("Latent space shape: ", mid.shape)
 		out=decode_model(mid)
