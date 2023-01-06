@@ -747,7 +747,7 @@ def train_heterg(trainset, pts, encode_model, decode_model, params, options):
 				dcpx_out=np.fft.irfft2(dcpx[0].numpy()+1j*dcpx[1].numpy())
 				#dcpx_out=tf.expand_dims(dcpx_out, axis=-1)
 				dcpx_out=dcpx_out.reshape((len(dcpx_out),-1))############################################
-				conf=encode_model(dcpx_out[:options.batchsz], training=True)
+				conf=encode_model(dcpx_out, training=True)
 				
 							
 				## regularization of the latent layer range
