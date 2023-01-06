@@ -1067,7 +1067,8 @@ def main():
 			
 			## save to hdf file
 			if options.gradout:
-				allgrds=allgrds.reshape((len(allgrds),-1))
+				#allgrds=allgrds.reshape((len(allgrds),-1))
+				dcpx_out=dcpx_out.reshape((len(dcpx_out),-1))
 				print("Gradient shape: ", dcpx_out.shape) ############################################
 				ag=from_numpy(np.hstack([allscr[:,None], allgrds]))
 				ag.write_image(options.gradout)
