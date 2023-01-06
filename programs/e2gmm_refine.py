@@ -723,7 +723,7 @@ def calc_gradient(trainset, pts, params, options):
 	return allscr, allgrds
 	
 #### train the conformation manifold from particles
-def train_heterg(dcpx,trainset, pts, encode_model, decode_model, params, options):
+def train_heterg(trainset, pts, encode_model, decode_model, params, options):
 	npt=pts.shape[1]
 	pas=[int(i) for i in options.pas]
 	pas=tf.constant(np.array([pas[0],pas[0],pas[0],pas[1],pas[2]], dtype=floattype))
@@ -737,13 +737,14 @@ def train_heterg(dcpx,trainset, pts, encode_model, decode_model, params, options
 	## Training
 	allcost=[]
 	for itr in range(options.niter):
-		dcpx_out=np.fft.irfft2(dcpx[0].numpy()+1j*dcpx[1].numpy())
+		
 		i=0
 		cost=[]
-		for pjr,pji,xf in trainset:   #grd,
+		for dcpx,pjr,pji,xf in trainset:   #grd,
 			pj_cpx=(pjr, pji)
 			with tf.GradientTape() as gt:
 				## from gradient input to the latent space
+				dcpx_out=np.fft.irfft2(dcpx[0].numpy()+1j*dcpx[1].numpy())
 				conf=encode_model(dcpx_out, training=True)
 				
 							
@@ -1083,7 +1084,7 @@ def main():
 		else:
 			decode_model=build_decoder(pts[0].numpy(), ninp=options.nmid, conv=options.conv,mid=options.ndense)
 		
-		mid=encode_model(allgrds[:bsz])#allgrds
+		mid=encode_model(allgrds[:bsz])
 		print("Latent space shape: ", mid.shape)
 		out=decode_model(mid)
 		print("Output shape: ",out.shape)
@@ -1094,7 +1095,7 @@ def main():
 		trainset=tf.data.Dataset.from_tensor_slices((allgrds[ptclidx], dcpx[0][ptclidx], dcpx[1][ptclidx], xfsnp[ptclidx]))
 		trainset=trainset.batch(bsz)
 		
-		train_heterg(dcpx,trainset, pts, encode_model, decode_model, params, options)
+		train_heterg(trainset, pts, encode_model, decode_model, params, options)
 		
 		if options.decoderout!=None: 
 			decode_model.save(options.decoderout)
