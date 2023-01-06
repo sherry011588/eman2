@@ -1068,9 +1068,9 @@ def main():
 			
 			## save to hdf file
 			if options.gradout:
-				#allgrds=allgrds.reshape((len(allgrds),-1))
-				dcpx_out=dcpx_out.reshape((len(dcpx_out),-1))############################################
-				print("Gradient shape: ", dcpx_out.shape) ############################################
+				allgrds=allgrds.reshape((len(allgrds),-1))
+				#dcpx_out=dcpx_out.reshape((len(dcpx_out),-1))############################################
+				print("Gradient shape: ", allgrds.shape) ############################################
 				ag=from_numpy(np.hstack([allscr[:,None], allgrds]))
 				ag.write_image(options.gradout)
 				del ag
@@ -1095,7 +1095,7 @@ def main():
 		
 		#### actual training
 		ptclidx=allscr>-1
-		trainset=tf.data.Dataset.from_tensor_slices((allgrds[ptclidx], dcpx[0][ptclidx], dcpx[1][ptclidx], xfsnp[ptclidx]))
+		trainset=tf.data.Dataset.from_tensor_slices((dcpx_out[:bsz], dcpx[0][ptclidx], dcpx[1][ptclidx], xfsnp[ptclidx]))#######allgrds[ptclidx]
 		trainset=trainset.batch(bsz)
 		
 		train_heterg(trainset, pts, encode_model, decode_model, params, options)
@@ -1109,7 +1109,7 @@ def main():
 			print("Encoder saved as ",options.encoderout)
 		
 		## conformation output
-		mid=calc_conf(encode_model, allgrds[ptclidx], 1000)
+		mid=calc_conf(encode_model, dcpx_out[:bsz], 1000)#######allgrds[ptclidx]
 		
 		if options.midout:
 			sv=np.hstack([np.where(ptclidx)[0][:,None], mid])
