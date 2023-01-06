@@ -1043,13 +1043,13 @@ def main():
 			
 		save_ptcls_xform(xfsnp, raw_boxsz, options, frcs)
 
-#	#### Heterogeneity analysis from particles
-#	bsz=options.batchsz
-#	if options.ptclsin and options.heter:
-#		pts=tf.constant(pts[None,:,:])
-#		params=set_indices_boxsz(maxboxsz)
-#		dcpx=get_clip(data_cpx, params["sz"], clipid)
-#		dcpx_out=np.fft.irfft2(dcpx[0].numpy()+1j*dcpx[1].numpy())#################################################
+	#### Heterogeneity analysis from particles
+	bsz=options.batchsz
+	if options.ptclsin and options.heter:
+		pts=tf.constant(pts[None,:,:])
+		params=set_indices_boxsz(maxboxsz)
+		dcpx=get_clip(data_cpx, params["sz"], clipid)
+		dcpx_out=np.fft.irfft2(dcpx[0].numpy()+1j*dcpx[1].numpy())#################################################
 #		#### calculate d(FRC)/d(GMM) for each particle
 #		##   this will be the input for the deep network in place of the particle images
 #		if options.gradin:
