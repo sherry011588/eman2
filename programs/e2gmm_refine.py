@@ -746,7 +746,7 @@ def train_heterg(trainset, pts, encode_model, decode_model, params, options):
 				## from gradient input to the latent space
 				dcpx_out=np.fft.irfft2(dcpx[0].numpy()+1j*dcpx[1].numpy())
 				dcpx_out=tf.expand_dims(dcpx_out, axis=-1)
-				conf=encode_model(dcpx_out, training=True)
+				conf=encode_model(dcpx_out[:options.batchsz], training=True)
 				
 							
 				## regularization of the latent layer range
@@ -785,7 +785,7 @@ def train_heterg(trainset, pts, encode_model, decode_model, params, options):
 					#loss+=tf.reduce_sum((pout[:,:,:3]-pts[:,:,:3])**2)/len(pts)/xf.shape[0]*options.modelreg
 				
 				
-				loss = tf.reduce_mean(tf.reduce_sum(tf.keras.losses.binary_crossentropy(dcpx_out, pout),axis=1))#, axis=(1, 2)
+				loss = tf.reduce_mean(tf.reduce_sum(tf.keras.losses.binary_crossentropy(dcpx_out[:options.batchsz], pout),axis=1))#, axis=(1, 2)
 				
 				#################D_KL
 				D_KL = -0.5 * tf.math.reduce_sum(1+z_log_var -tf.math.exp(z_log_var)-z_mean**2,axis=1)
