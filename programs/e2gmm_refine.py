@@ -745,7 +745,7 @@ def train_heterg(trainset, pts, encode_model, decode_model, params, options):
 			with tf.GradientTape() as gt:
 				## from gradient input to the latent space
 				dcpx_out=np.fft.irfft2(dcpx[0].numpy()+1j*dcpx[1].numpy())
-				dcpx_out=tf.expand_dims(dcpx_out, axis=-1)
+				#dcpx_out=tf.expand_dims(dcpx_out, axis=-1)
 				conf=encode_model(dcpx_out[:options.batchsz], training=True)
 				
 							
@@ -1048,7 +1048,7 @@ def main():
 		pts=tf.constant(pts[None,:,:])
 		params=set_indices_boxsz(maxboxsz)
 		dcpx=get_clip(data_cpx, params["sz"], clipid)
-		
+		dcpx_out=np.fft.irfft2(dcpx[0].numpy()+1j*dcpx[1].numpy())#################################################
 		#### calculate d(FRC)/d(GMM) for each particle
 		##   this will be the input for the deep network in place of the particle images
 		if options.gradin:
@@ -1068,7 +1068,7 @@ def main():
 			## save to hdf file
 			if options.gradout:
 				allgrds=allgrds.reshape((len(allgrds),-1))
-				print("Gradient shape: ", allgrds.shape) 
+				print("Gradient shape: ", dcpx_out.shape) ############################################
 				ag=from_numpy(np.hstack([allscr[:,None], allgrds]))
 				ag.write_image(options.gradout)
 				del ag
@@ -1085,7 +1085,7 @@ def main():
 		else:
 			decode_model=build_decoder(pts[0].numpy(), ninp=options.nmid, conv=options.conv,mid=options.ndense)
 		
-		mid=encode_model(allgrds[:bsz])
+		mid=encode_model(dcpx_out[:bsz])############################################
 		print("Latent space shape: ", mid.shape)
 		out=decode_model(mid)
 		print("Output shape: ",out.shape)
