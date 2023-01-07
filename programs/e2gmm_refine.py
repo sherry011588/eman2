@@ -1095,7 +1095,7 @@ def main():
 		print("Deviation from neutral model: ", np.mean(abs(out-pts)))
 		
 		#### actual training
-		ptclidx=0#allscr>-1
+		ptclidx=0#allscr>-1############################################ 
 		trainset=tf.data.Dataset.from_tensor_slices((dcpx_out[ptclidx], dcpx[0][ptclidx], dcpx[1][ptclidx], xfsnp[ptclidx]))#######allgrds[ptclidx]
 		trainset=trainset.batch(bsz)
 		
