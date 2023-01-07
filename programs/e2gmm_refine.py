@@ -1050,6 +1050,7 @@ def main():
 		params=set_indices_boxsz(maxboxsz)
 		dcpx=get_clip(data_cpx, params["sz"], clipid)
 		dcpx_out=np.fft.irfft2(dcpx[0].numpy()+1j*dcpx[1].numpy())#################################################
+		#dcpx_out=dcpx_out.reshape((len(dcpx_out),-1))############################################
 #		#### calculate d(FRC)/d(GMM) for each particle
 #		##   this will be the input for the deep network in place of the particle images
 #		if options.gradin:
@@ -1086,7 +1087,7 @@ def main():
 			decode_model=tf.keras.models.load_model(f"{options.decoderin}",compile=False)
 		else:
 			decode_model=build_decoder(pts[0].numpy(), ninp=options.nmid, conv=options.conv,mid=options.ndense)
-		#dcpx_out=dcpx_out.reshape((len(dcpx_out),-1))############################################
+
 		mid=encode_model(dcpx_out)############################################
 		print("Latent space shape: ", mid.shape)
 		out=decode_model(mid)
