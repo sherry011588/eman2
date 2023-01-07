@@ -1051,6 +1051,7 @@ def main():
 		dcpx=get_clip(data_cpx, params["sz"], clipid)
 		dcpx_out=np.fft.irfft2(dcpx[0].numpy()+1j*dcpx[1].numpy())#################################################
 		#dcpx_out=dcpx_out.reshape((len(dcpx_out),-1))############################################
+
 #		#### calculate d(FRC)/d(GMM) for each particle
 #		##   this will be the input for the deep network in place of the particle images
 #		if options.gradin:
@@ -1070,13 +1071,12 @@ def main():
 #			## save to hdf file
 #			if options.gradout:
 #				allgrds=allgrds.reshape((len(allgrds),-1))
-#				#dcpx_out=dcpx_out.reshape((len(dcpx_out),-1))############################################
-#				print("Gradient shape: ", allgrds.shape) ############################################
+#				print("Gradient shape: ", allgrds.shape)
 #				ag=from_numpy(np.hstack([allscr[:,None], allgrds]))
 #				ag.write_image(options.gradout)
 #				del ag
 #				allgrds=allgrds.reshape((len(allgrds), npt, 5))
-				
+
 		#### build deep networks and make sure they work
 		if options.encoderin:
 			encode_model=tf.keras.models.load_model(f"{options.encoderin}",compile=False)
