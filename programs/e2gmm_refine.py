@@ -1097,8 +1097,8 @@ def main():
 		print("Deviation from neutral model: ", np.mean(abs(out-pts)))
 		
 		#### actual training
-		dcpx_out=dcpx_out.astype('int64')
 		ptclidx=allscr[:]#>-1############################################ 
+		ptclidx=ptclidx.astype('int64')
 		trainset=tf.data.Dataset.from_tensor_slices((dcpx_out[ptclidx], dcpx[0][ptclidx], dcpx[1][ptclidx], xfsnp[ptclidx]))#######allgrds[ptclidx]
 		trainset=trainset.batch(bsz)
 		
