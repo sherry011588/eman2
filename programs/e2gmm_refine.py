@@ -1097,9 +1097,9 @@ def main():
 		print("Deviation from neutral model: ", np.mean(abs(out-pts)))
 		
 		#### actual training
-		ptclidx=allscr[:]#>-1############################################ 
-		ptclidx=ptclidx.astype('int')
-		trainset=tf.data.Dataset.from_tensor_slices((dcpx_out[ptclidx], dcpx[0][ptclidx], dcpx[1][ptclidx], xfsnp[ptclidx]))#######allgrds[ptclidx]
+		#ptclidx=allscr[:]#>-1############################################ 
+		#ptclidx=ptclidx.astype('int')
+		trainset=tf.data.Dataset.from_tensor_slices((dcpx_out[:], dcpx[0][:], dcpx[1][:], xfsnp[:]))#######allgrds[ptclidx]
 		trainset=trainset.batch(bsz)
 		
 		train_heterg(trainset, pts, encode_model, decode_model, params, options)
@@ -1113,10 +1113,10 @@ def main():
 			print("Encoder saved as ",options.encoderout)
 		
 		## conformation output
-		mid=calc_conf(encode_model, dcpx_out[ptclidx], 1000)#######allgrds[ptclidx]
+		mid=calc_conf(encode_model, dcpx_out[:], 1000)#######allgrds[ptclidx]
 		
 		if options.midout:
-			sv=np.hstack([np.where(ptclidx)[0][:,None], mid])
+			sv=np.hstack([np.where(:)[0][:,None], mid])
 			print(mid.shape, sv.shape)
 			np.savetxt(options.midout, sv)
 		
