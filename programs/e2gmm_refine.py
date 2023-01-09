@@ -1116,7 +1116,7 @@ def main():
 		mid=calc_conf(encode_model, dcpx_out[:], 1000)#######allgrds[ptclidx]
 		
 		if options.midout:
-			sv=np.hstack([np.where(:)[0][:,None], mid])
+			sv=np.hstack([np.where(allscr[:])[0][:,None], mid])
 			print(mid.shape, sv.shape)
 			np.savetxt(options.midout, sv)
 		
