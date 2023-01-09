@@ -1090,7 +1090,7 @@ def main():
 		else:
 			decode_model=build_decoder(pts[0].numpy(), ninp=options.nmid, conv=options.conv,mid=options.ndense)
 
-		mid=encode_model(dcpx_out[:bsz])############################################
+		mid=encode_model(dcpx_out)##allgrds[:bsz]##########################################
 		print("Latent space shape: ", mid.shape)
 		out=decode_model(mid)
 		print("Output shape: ",out.shape)
