@@ -341,8 +341,6 @@ def build_encoder(mid=512, nout=4, conv=False, ninp=-1):
 		#tf.keras.layers.Reshape((ss,ss,1)),
 		
 		tf.keras.layers.InputLayer(input_shape=(48,48,1)),
-		#tf.keras.layers.Input(shape=[48,1]),###########test1
-		#tf.keras.layers.Input(shape=[48,48]),###########test2
 
 		tf.keras.layers.Conv2D(4, 5, activation="relu", strides=(2,2), padding="same"),
 		tf.keras.layers.Conv2D(8, 5, activation="relu", strides=(2,2), padding="same"),
@@ -744,13 +742,13 @@ def train_heterg(trainset, pts, encode_model, decode_model, params, options):
 		
 		i=0
 		cost=[]
-		for pjr,pji,xf in trainset:   #grd,dcpx,
+		for dcpx,pjr,pji,xf in trainset:   #grd,
 			pj_cpx=(pjr, pji)
 			with tf.GradientTape() as gt:
 				## from gradient input to the latent space
-				#dcpx_out=np.fft.irfft2(dcpx[0].numpy()+1j*dcpx[1].numpy())
-				#dcpx_out=tf.expand_dims(dcpx_out, axis=-1)#####test1######################
-				conf=encode_model(options.projs, training=True)
+				dcpx_out=np.fft.irfft2(dcpx[0].numpy()+1j*dcpx[1].numpy())
+				#dcpx_out=tf.expand_dims(dcpx_out, axis=-1)#########################
+				conf=encode_model(dcpx_out, training=True)
 				
 							
 				## regularization of the latent layer range
@@ -789,7 +787,7 @@ def train_heterg(trainset, pts, encode_model, decode_model, params, options):
 					#loss+=tf.reduce_sum((pout[:,:,:3]-pts[:,:,:3])**2)/len(pts)/xf.shape[0]*options.modelreg
 				
 				
-				loss = tf.reduce_mean(tf.reduce_sum(tf.keras.losses.binary_crossentropy(options.projs, pout),axis=1))#, axis=(1, 2)
+				loss = tf.reduce_mean(tf.reduce_sum(tf.keras.losses.binary_crossentropy(dcpx_out, pout),axis=1))####, axis=(1, 2)
 				
 				#################D_KL
 				D_KL = -0.5 * tf.math.reduce_sum(1+z_log_var -tf.math.exp(z_log_var)-z_mean**2,axis=1)
@@ -1052,8 +1050,8 @@ def main():
 		pts=tf.constant(pts[None,:,:])
 		params=set_indices_boxsz(maxboxsz)
 		dcpx=get_clip(data_cpx, params["sz"], clipid)
-		#dcpx_out=np.fft.irfft2(dcpx[0].numpy()+1j*dcpx[1].numpy())###############################
-		#dcpx_out=tf.expand_dims(dcpx_out, axis=-1)#####test1######################
+		dcpx_out=np.fft.irfft2(dcpx[0].numpy()+1j*dcpx[1].numpy())###############################
+		#dcpx_out=tf.expand_dims(dcpx_out, axis=-1)##########################
 
 		#### calculate d(FRC)/d(GMM) for each particle
 		##   this will be the input for the deep network in place of the particle images
@@ -1091,7 +1089,7 @@ def main():
 		else:
 			decode_model=build_decoder(pts[0].numpy(), ninp=options.nmid, conv=options.conv,mid=options.ndense)
 
-		mid=encode_model(options.projs)##allgrds[:bsz]#dcpx_out#########################################
+		mid=encode_model(dcpx_out)##allgrds[:bsz]##########################################
 		print("Latent space shape: ", mid.shape)
 		out=decode_model(mid)
 		print("Output shape: ",out.shape)
@@ -1099,7 +1097,7 @@ def main():
 		
 		#### actual training
 		ptclidx=allscr>-1
-		trainset=tf.data.Dataset.from_tensor_slices((options.projs[ptclidx], dcpx[0][ptclidx], dcpx[1][ptclidx], xfsnp[ptclidx]))#######allgrds[ptclidx]
+		trainset=tf.data.Dataset.from_tensor_slices((dcpx_out[ptclidx], dcpx[0][ptclidx], dcpx[1][ptclidx], xfsnp[ptclidx]))#######allgrds[ptclidx]
 		trainset=trainset.batch(bsz)
 		
 		train_heterg(trainset, pts, encode_model, decode_model, params, options)
@@ -1113,7 +1111,7 @@ def main():
 			print("Encoder saved as ",options.encoderout)
 		
 		## conformation output
-		mid=calc_conf(encode_model, options.projs[ptclidx], 1000)#######allgrds[ptclidx]
+		mid=calc_conf(encode_model, dcpx_out[ptclidx], 1000)#######allgrds[ptclidx]
 		
 		if options.midout:
 			sv=np.hstack([np.where(ptclidx)[0][:,None], mid])
