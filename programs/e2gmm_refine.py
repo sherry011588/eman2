@@ -747,7 +747,7 @@ def train_heterg(trainset, pts, encode_model, decode_model, params, options):
 			with tf.GradientTape() as gt:
 				## from gradient input to the latent space
 				dcpx_out=np.fft.irfft2(dcpx[0].numpy()+1j*dcpx[1].numpy())
-				#dcpx_out=tf.expand_dims(dcpx_out, axis=-1)#########################
+				dcpx_out=tf.expand_dims(dcpx_out, axis=-1)#########################
 				conf=encode_model(dcpx_out, training=True)
 				
 							
