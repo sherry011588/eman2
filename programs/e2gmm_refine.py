@@ -744,14 +744,14 @@ def train_heterg(trainset, pts, encode_model, decode_model, params, options):
 		
 		i=0
 		cost=[]
-		for projs,pjr,pji,xf in trainset:   #grd,
+		for dcpx,pjr,pji,xf in trainset:   #grd,
 			pj_cpx=(pjr, pji)
 			with tf.GradientTape() as gt:
 				## from gradient input to the latent space
-				#dcpx_out=np.fft.irfft2(dcpx[0].numpy()+1j*dcpx[1].numpy())
+				dcpx_out=np.fft.irfft2(dcpx[0].numpy()+1j*dcpx[1].numpy())
 				#dcpx_out=tf.expand_dims(dcpx_out, axis=-1)#####test1######################
 				#dcpx_out=dcpx_out.reshape((len(dcpx_out),-1))###test2##############
-				conf=encode_model(projs, training=True)
+				conf=encode_model(dcpx_out, training=True)
 				
 							
 				## regularization of the latent layer range
@@ -1053,7 +1053,7 @@ def main():
 		pts=tf.constant(pts[None,:,:])
 		params=set_indices_boxsz(maxboxsz)
 		dcpx=get_clip(data_cpx, params["sz"], clipid)
-		#dcpx_out=np.fft.irfft2(dcpx[0].numpy()+1j*dcpx[1].numpy())###############################
+		dcpx_out=np.fft.irfft2(dcpx[0].numpy()+1j*dcpx[1].numpy())###############################
 		#dcpx_out=tf.expand_dims(dcpx_out, axis=-1)#####test1######################
 		#dcpx_out=dcpx_out.reshape((len(dcpx_out),-1))####test2###############################
 
@@ -1093,7 +1093,7 @@ def main():
 		else:
 			decode_model=build_decoder(pts[0].numpy(), ninp=options.nmid, conv=options.conv,mid=options.ndense)
 
-		mid=encode_model(options.projs)##allgrds[:bsz]##########################################
+		mid=encode_model(dcpx_out)##allgrds[:bsz]##########################################
 		print("Latent space shape: ", mid.shape)
 		out=decode_model(mid)
 		print("Output shape: ",out.shape)
@@ -1101,7 +1101,7 @@ def main():
 		
 		#### actual training
 		ptclidx=allscr>-1
-		trainset=tf.data.Dataset.from_tensor_slices((options.projs[ptclidx], dcpx[0][ptclidx], dcpx[1][ptclidx], xfsnp[ptclidx]))#######allgrds[ptclidx]
+		trainset=tf.data.Dataset.from_tensor_slices((dcpx_out[ptclidx], dcpx[0][ptclidx], dcpx[1][ptclidx], xfsnp[ptclidx]))#######allgrds[ptclidx]
 		trainset=trainset.batch(bsz)
 		
 		train_heterg(trainset, pts, encode_model, decode_model, params, options)
@@ -1115,7 +1115,7 @@ def main():
 			print("Encoder saved as ",options.encoderout)
 		
 		## conformation output
-		mid=calc_conf(encode_model, options.projs[ptclidx], 1000)#######allgrds[ptclidx]
+		mid=calc_conf(encode_model, dcpx_out[ptclidx], 1000)#######allgrds[ptclidx]
 		
 		if options.midout:
 			sv=np.hstack([np.where(ptclidx)[0][:,None], mid])
