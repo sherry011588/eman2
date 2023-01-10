@@ -742,7 +742,7 @@ def train_heterg(trainset, pts, encode_model, decode_model, params, options):
 		
 		i=0
 		cost=[]
-		for pjr,pji,xf in trainset:   #grd,
+		for projs,pjr,pji,xf in trainset:   #grd,
 			pj_cpx=(pjr, pji)
 			with tf.GradientTape() as gt:
 				## from gradient input to the latent space
