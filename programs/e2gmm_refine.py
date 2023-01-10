@@ -341,8 +341,8 @@ def build_encoder(mid=512, nout=4, conv=False, ninp=-1):
 		#tf.keras.layers.Reshape((ss,ss,1)),
 		
 		#tf.keras.layers.InputLayer(input_shape=(48,48,1)),
-		#tf.keras.layers.Input(shape=[48,1]),###########test1
-		tf.keras.layers.Input(shape=[48,48]),###########test2
+		tf.keras.layers.Input(shape=[48,1]),###########test1
+		#tf.keras.layers.Input(shape=[48,48]),###########test2
 
 		tf.keras.layers.Conv2D(4, 5, activation="relu", strides=(2,2), padding="same"),
 		tf.keras.layers.Conv2D(8, 5, activation="relu", strides=(2,2), padding="same"),
