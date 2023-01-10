@@ -1010,7 +1010,7 @@ def main():
 			maxboxsz=options.maxboxsz=ceil(raw_boxsz*raw_apix*2/options.maxres)//2*2
 			print("using box size {}, max resolution {:.1f}".format(maxboxsz, options.maxres))
 			
-		data_cpx, xfsnp = load_particles(options.ptclsin,maxboxsz,shuffle=False)
+		data_cpx, xfsnp,projs = load_particles(options.ptclsin,maxboxsz,shuffle=False)
 		apix=raw_apix*raw_boxsz/maxboxsz
 		clipid=set_indices_boxsz(data_cpx[0].shape[1], apix, True)
 		
