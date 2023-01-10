@@ -768,7 +768,7 @@ def train_heterg(trainset, pts, encode_model, decode_model, params, options):
 				## but we do not train the sigma of the random value here
 				## since we control the radius of latent space already, this seems enough
                 
-				#conf=options.perturb*tf.random.normal(conf.shape)+conf
+				conf=options.perturb*tf.random.normal(conf.shape)+conf########################
                 
 				# 0.1 is a pretty big perturbation for this range, maybe responsible for the random churn in the models? --steve
 				#conf=.1*tf.random.normal(conf.shape)+conf
@@ -783,8 +783,8 @@ def train_heterg(trainset, pts, encode_model, decode_model, params, options):
 				fval=calc_frc(pj_cpx, imgs_cpx, params["rings"])
 				#loss=-tf.reduce_mean(fval)+cl*1e-2
 				
-				#loss = tf.reduce_mean(tf.reduce_sum(tf.keras.losses.binary_crossentropy(projs, pout), axis=(1, 2)))####,axis=1
-				loss = tf.keras.losses.binary_crossentropy(projs, pout)
+				loss = tf.reduce_mean(tf.reduce_sum(tf.keras.losses.binary_crossentropy(projs, pout)))####,axis=1, axis=(1, 2)
+				#loss = tf.keras.losses.binary_crossentropy(projs, pout)
 				
 				if options.modelreg>0: 
 					loss+=tf.reduce_sum((pout[:,:,:3]-pts[:,:,:3])**2)/len(pts)/xf.shape[0]*options.modelreg
