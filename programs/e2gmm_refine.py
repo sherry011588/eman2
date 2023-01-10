@@ -750,7 +750,6 @@ def train_heterg(trainset, pts, encode_model, decode_model, params, options):
 				## from gradient input to the latent space
 				dcpx_out=np.fft.irfft2(dcpx[0].numpy()+1j*dcpx[1].numpy())
 				dcpx_out=tf.expand_dims(dcpx_out, axis=-1)#####test1######################
-				dcpx_out=dcpx_out.reshape((len(dcpx_out),-1))###test2##############
 				conf=encode_model(dcpx_out, training=True)
 				
 							
@@ -1055,7 +1054,6 @@ def main():
 		dcpx=get_clip(data_cpx, params["sz"], clipid)
 		dcpx_out=np.fft.irfft2(dcpx[0].numpy()+1j*dcpx[1].numpy())###############################
 		dcpx_out=tf.expand_dims(dcpx_out, axis=-1)#####test1######################
-		dcpx_out=dcpx_out.reshape((len(dcpx_out),-1))####test2###############################
 
 		#### calculate d(FRC)/d(GMM) for each particle
 		##   this will be the input for the deep network in place of the particle images
