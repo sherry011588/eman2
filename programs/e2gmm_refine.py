@@ -1093,7 +1093,7 @@ def main():
 		else:
 			decode_model=build_decoder(pts[0].numpy(), ninp=options.nmid, conv=options.conv,mid=options.ndense)
 
-		mid=encode_model(projs)##allgrds[:bsz]##########################################
+		mid=encode_model(options.projs)##allgrds[:bsz]##########################################
 		print("Latent space shape: ", mid.shape)
 		out=decode_model(mid)
 		print("Output shape: ",out.shape)
@@ -1101,7 +1101,7 @@ def main():
 		
 		#### actual training
 		ptclidx=allscr>-1
-		trainset=tf.data.Dataset.from_tensor_slices((projs[ptclidx], dcpx[0][ptclidx], dcpx[1][ptclidx], xfsnp[ptclidx]))#######allgrds[ptclidx]
+		trainset=tf.data.Dataset.from_tensor_slices((options.projs[ptclidx], dcpx[0][ptclidx], dcpx[1][ptclidx], xfsnp[ptclidx]))#######allgrds[ptclidx]
 		trainset=trainset.batch(bsz)
 		
 		train_heterg(trainset, pts, encode_model, decode_model, params, options)
@@ -1115,7 +1115,7 @@ def main():
 			print("Encoder saved as ",options.encoderout)
 		
 		## conformation output
-		mid=calc_conf(encode_model, projs[ptclidx], 1000)#######allgrds[ptclidx]
+		mid=calc_conf(encode_model, options.projs[ptclidx], 1000)#######allgrds[ptclidx]
 		
 		if options.midout:
 			sv=np.hstack([np.where(ptclidx)[0][:,None], mid])
