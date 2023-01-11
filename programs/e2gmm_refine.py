@@ -774,16 +774,16 @@ def train_heterg(trainset, pts, encode_model, decode_model, params, options):
 				#conf=.1*tf.random.normal(conf.shape)+conf
 				
 				## mask out the target columns based on --pas
-				pout=decode_model(conf, training=True)
+				poutt=decode_model(conf, training=True)
 				p0=tf.zeros((xf.shape[0],npt, 5))+pts
-				pout=pout*pas+p0*(1-pas)
+				pout=poutt*pas+p0*(1-pas)
 				
 				## finally generate images and calculate frc
 				imgs_cpx=pts2img(pout, xf, params, sym=options.sym)
 				fval=calc_frc(pj_cpx, imgs_cpx, params["rings"])
 				#loss=-tf.reduce_mean(fval)+cl*1e-2
 				
-				loss = tf.reduce_mean(tf.keras.losses.binary_crossentropy( projs , fval ))####,axis=1, axis=(1, 2)pout
+				loss = tf.reduce_mean(tf.keras.losses.binary_crossentropy( projs , poutt ))####,axis=1, axis=(1, 2)
 				
 				if options.modelreg>0: 
 					loss+=tf.reduce_sum((pout[:,:,:3]-pts[:,:,:3])**2)/len(pts)/xf.shape[0]*options.modelreg
