@@ -781,9 +781,9 @@ def train_heterg(trainset, pts, encode_model, decode_model, params, options):
 				## finally generate images and calculate frc
 				imgs_cpx=pts2img(pout, xf, params, sym=options.sym)
 				fval=calc_frc(pj_cpx, imgs_cpx, params["rings"])
-				#loss=-tf.reduce_mean(fval)+cl*1e-2
+				loss=-tf.reduce_mean(fval)#+cl*1e-2
 				
-				loss = tf.reduce_mean(tf.keras.losses.binary_crossentropy( projs , poutt ))####,axis=1, axis=(1, 2)
+				#loss = tf.reduce_mean(tf.keras.losses.binary_crossentropy( projs , poutt ))####,axis=1, axis=(1, 2)
 				
 				if options.modelreg>0: 
 					loss+=tf.reduce_sum((pout[:,:,:3]-pts[:,:,:3])**2)/len(pts)/xf.shape[0]*options.modelreg
