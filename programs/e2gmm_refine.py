@@ -163,7 +163,7 @@ def pts2img(pts, ang, params, lp=.1, sym="c1"):
 		mean = 0
 		std = 1
 		qgaussian = genpareto(c=q, loc=mean, scale=std)
-		amp = qgaussian(-rrft*lp*bsigma0)*bamp0###################
+		amp = qgaussian.pdf(-rrft*lp*bsigma0)*bamp0###################
 		#amp=tf.exp(-rrft*lp*bsigma0)*bamp0###################
 		pgauss_real=tf.cos(cpxang)*amp
 		pgauss_imag=-tf.sin(cpxang)*amp
