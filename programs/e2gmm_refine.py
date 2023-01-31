@@ -168,7 +168,7 @@ def pts2img(pts, ang, params, lp=.1, sym="c1"):
 		bsigma0=tf.nn.relu(bsigma[:,:,None, None])
 		
 		###qgaussian
-		q = 0.9
+		q = 0.999
 		#mean = 0
 		#std = 1
 		#qgaussian = genpareto(c=q, loc=mean, scale=std)
@@ -181,7 +181,7 @@ def pts2img(pts, ang, params, lp=.1, sym="c1"):
 		#amp = tf.pow(1+((-rrft*lp*bsigma0)/(-0.5)),-q/2)*bamp0
 		
 		#test4
-		e=tf.pow((1+(1-q)(-rrft*lp*bsigma0)),(1/(1-q)))
+		e=tf.pow((1+(1-q)*(-rrft*lp*bsigma0)),(1/(1-q)))
 		amp = e*bamp0
 		#amp=tf.exp(-rrft*lp*bsigma0)*bamp0###################
 		pgauss_real=tf.cos(cpxang)*amp
