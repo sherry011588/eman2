@@ -168,7 +168,7 @@ def pts2img(pts, ang, params, lp=.1, sym="c1"):
 		bsigma0=tf.nn.relu(bsigma[:,:,None, None])
 		
 		###qgaussian
-		q = 0.999
+		q = 0.9
 		#mean = 0
 		#std = 1
 		#qgaussian = genpareto(c=q, loc=mean, scale=std)
