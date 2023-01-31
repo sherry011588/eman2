@@ -169,24 +169,13 @@ def pts2img(pts, ang, params, lp=.1, sym="c1"):
 		
 		###qgaussian
 		q = 0.999
-		#mean = 0
-		#std = 1
-		#qgaussian = genpareto(c=q, loc=mean, scale=std)
-		#amp = qgaussian.pdf(-rrft*lp*bsigma0)*bamp0###################
-		
-		#test2
-		#amp = qgaussian_pdf(-rrft*lp*bsigma0, q, mean, std)*bamp0
-
-		#test3
-		#amp = tf.pow(1+((-rrft*lp*bsigma0)/(-0.5)),-q/2)*bamp0
-		
-		#test4
 		e=tf.pow((1+(1-q)*(-rrft*lp*bsigma0)),(1/(1-q)))
 		amp = e*bamp0
+		
 		#amp=tf.exp(-rrft*lp*bsigma0)*bamp0###################
 		pgauss_real=tf.cos(cpxang)*amp
 		pgauss_imag=-tf.sin(cpxang)*amp
-
+		
 		imgs_real+=tf.reduce_sum(pgauss_real, axis=1)
 		imgs_imag+=tf.reduce_sum(pgauss_imag, axis=1)
 
