@@ -108,15 +108,6 @@ def xf2pts(pts, ang):
 	return pts_rot_trans
 
 
-
-####
-def qgaussian_pdf(x, q, mu, sigma):
-    A = (1/(sigma * (2-q) * np.math.gamma(1/(1-q))))
-    exp_q = (1 - (np.abs(x-mu)/(sigma*(2-q)))**(1/(1-q)))**(1/(1-q))
-    return A * np.exp(-exp_q)
-
-
-
 #### make 2D projections from Gaussian coordinates in Fourier space
 ##   input:  pts - ( batch size, number of Gaussian, 5 (x,y,z,amp,sigma) )
 ##                 ( number of Gaussian, 3) should also work
@@ -168,11 +159,12 @@ def pts2img(pts, ang, params, lp=.1, sym="c1"):
 		bsigma0=tf.nn.relu(bsigma[:,:,None, None])
 		
 		###qgaussian
-		q = 0.999
-		e=tf.pow((1+(1-q)*(-rrft*lp*bsigma0)),(1/(1-q)))
-		amp = e*bamp0
+		#q = 0.999
+		#e=tf.pow((1+(1-q)*(-rrft*lp*bsigma0)),(1/(1-q)))
+		#amp = e*bamp0
 		
-		#amp=tf.exp(-rrft*lp*bsigma0)*bamp0###################
+		amp=tf.exp(-rrft*lp*bsigma0)*bamp0###################
+
 		pgauss_real=tf.cos(cpxang)*amp
 		pgauss_imag=-tf.sin(cpxang)*amp
 		
