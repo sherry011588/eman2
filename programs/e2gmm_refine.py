@@ -159,11 +159,11 @@ def pts2img(pts, ang, params, lp=.1, sym="c1"):
 		bsigma0=tf.nn.relu(bsigma[:,:,None, None])
 		
 		###qgaussian
-		q = 0.999
-		e=tf.pow((1+(1-q)*(-rrft*lp*bsigma0)),(1/(1-q)))
-		amp = e*bamp0
+		#q = 0.999
+		#e=tf.pow((1+(1-q)*(-rrft*lp*bsigma0)),(1/(1-q)))
+		#amp = e*bamp0
 		
-		#amp=tf.exp(-rrft*lp*bsigma0)*bamp0###################
+		amp=tf.exp(-rrft*lp*bsigma0)*bamp0###################
 
 		pgauss_real=tf.cos(cpxang)*amp
 		pgauss_imag=-tf.sin(cpxang)*amp
