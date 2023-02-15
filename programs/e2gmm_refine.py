@@ -336,18 +336,18 @@ class Sampling(tf.keras.layers.Layer):
 def build_encoder(mid=512, nout=4, conv=False, ninp=-1):
 	l2=tf.keras.regularizers.l2(1e-3)
 	l1=tf.keras.regularizers.l1(1e-3)
-	#kinit=tf.keras.initializers.RandomNormal(0,0.001)	# was 0.01
-	kinit=tf.keras.initializers.HeNormal()
+	kinit=tf.keras.initializers.RandomNormal(0,0.001)	# was 0.01
+	#kinit=tf.keras.initializers.HeNormal()
 
 	
 	if conv:
 		ss=64
 		layers=[
-		#tf.keras.layers.Flatten(),
-		#tf.keras.layers.Dense(ss*ss, kernel_regularizer=l2),
-		#tf.keras.layers.Reshape((ss,ss,1)),
+		tf.keras.layers.Flatten(),
+		tf.keras.layers.Dense(ss*ss, kernel_regularizer=l2),
+		tf.keras.layers.Reshape((ss,ss,1)),
 		
-		tf.keras.layers.InputLayer(input_shape=(48,48,1)),
+		#tf.keras.layers.InputLayer(input_shape=(48,48,1)),
 
 		tf.keras.layers.Conv2D(4, 5, activation="relu", strides=(2,2), padding="same"),
 		tf.keras.layers.Conv2D(8, 5, activation="relu", strides=(2,2), padding="same"),
@@ -403,8 +403,8 @@ def build_decoder(pts, mid=512, ninp=4, conv=False):
 	
 	x0=tf.keras.Input(shape=(ninp))
 	
-	#kinit=tf.keras.initializers.RandomNormal(0,1e-2)
-	kinit=tf.keras.initializers.HeNormal()
+	kinit=tf.keras.initializers.RandomNormal(0,1e-2)
+	#kinit=tf.keras.initializers.HeNormal()
 	l2=tf.keras.regularizers.l2(1e-3)
 	l1=tf.keras.regularizers.l1(1e-3)
 	layer_output=tf.keras.layers.Dense(npt*5, kernel_initializer=kinit, activation="sigmoid",use_bias=True)
@@ -749,25 +749,23 @@ def train_heterg(trainset, pts, encode_model, decode_model, params, options):
 		
 		i=0
 		cost=[]
-		for projs,pjr,pji,xf in trainset:   #grd,
+		for grd,pjr,pji,xf in trainset:   #######################projs
 			pj_cpx=(pjr, pji)
 			with tf.GradientTape() as gt:
 				## from gradient input to the latent space
-				#dcpx_out=np.fft.irfft2(dcpx[0].numpy()+1j*dcpx[1].numpy())
-				#dcpx_out=tf.expand_dims(dcpx_out, axis=-1)#########################
-				conf=encode_model(projs, training=True)
+				conf=encode_model(grd, training=True)#######################projs
 				
 							
 				## regularization of the latent layer range
 				## ideally the output is within a 1-radius circle
 				## but we want to make the contraint more soft so it won't affect convergence
-				#cl=tf.math.sqrt(tf.reduce_sum(conf**2, axis=1))
-				#cl=tf.reduce_mean(tf.maximum(cl-1,0))
+				cl=tf.math.sqrt(tf.reduce_sum(conf**2, axis=1))########################
+				cl=tf.reduce_mean(tf.maximum(cl-1,0))########################
 				
 				##add mean log var  ninp=options.nmid 
-				z_mean = tf.keras.layers.Dense(7, name="z_mean")(conf)#options.nmid 8
-				z_log_var = tf.keras.layers.Dense(7, name="z_log_var")(conf)#options.nmid 8
-				conf = Sampling()([z_mean, z_log_var])
+				#z_mean = tf.keras.layers.Dense(7, name="z_mean")(conf)#options.nmid 8
+				#z_log_var = tf.keras.layers.Dense(7, name="z_log_var")(conf)#options.nmid 8
+				#conf = Sampling()([z_mean, z_log_var])
 				
 				
 				## perturb the conformation by a random value
@@ -775,7 +773,7 @@ def train_heterg(trainset, pts, encode_model, decode_model, params, options):
 				## but we do not train the sigma of the random value here
 				## since we control the radius of latent space already, this seems enough
                 
-				conf=options.perturb*tf.random.normal(conf.shape)+conf########################
+				conf=options.perturb*tf.random.normal(conf.shape)+conf
                 
 				# 0.1 is a pretty big perturbation for this range, maybe responsible for the random churn in the models? --steve
 				#conf=.1*tf.random.normal(conf.shape)+conf
@@ -788,19 +786,17 @@ def train_heterg(trainset, pts, encode_model, decode_model, params, options):
 				## finally generate images and calculate frc
 				imgs_cpx=pts2img(pout, xf, params, sym=options.sym)
 				fval=calc_frc(pj_cpx, imgs_cpx, params["rings"])
-				loss=-tf.reduce_mean(fval)#+cl*1e-2
-				
-				#loss = tf.reduce_mean(tf.keras.losses.binary_crossentropy( projs , poutt ))####,axis=1, axis=(1, 2)
+				loss=-tf.reduce_mean(fval)+cl*1e-2##########################################
 				
 				if options.modelreg>0: 
 					loss+=tf.reduce_sum((pout[:,:,:3]-pts[:,:,:3])**2)/len(pts)/xf.shape[0]*options.modelreg
 				
 				
 				#################D_KL
-				D_KL = -0.5 * tf.math.reduce_sum(1+z_log_var -tf.math.exp(z_log_var)-z_mean**2,axis=1)
+				#D_KL = -0.5 * tf.math.reduce_sum(1+z_log_var -tf.math.exp(z_log_var)-z_mean**2,axis=1)
 				
-				D_KL = tf.math.reduce_mean(D_KL) /xf.shape[0]*options.modelreg
-				loss = loss + 1.*D_KL
+				#D_KL = tf.math.reduce_mean(D_KL) /xf.shape[0]*options.modelreg
+				#loss = loss + 1.*D_KL
 				######################
 				
 			
@@ -1057,8 +1053,6 @@ def main():
 		pts=tf.constant(pts[None,:,:])
 		params=set_indices_boxsz(maxboxsz)
 		dcpx=get_clip(data_cpx, params["sz"], clipid)
-		#dcpx_out=np.fft.irfft2(dcpx[0].numpy()+1j*dcpx[1].numpy())###############################
-		#dcpx_out=tf.expand_dims(dcpx_out, axis=-1)##########################
 
 		#### calculate d(FRC)/d(GMM) for each particle
 		##   this will be the input for the deep network in place of the particle images
@@ -1096,7 +1090,7 @@ def main():
 		else:
 			decode_model=build_decoder(pts[0].numpy(), ninp=options.nmid, conv=options.conv,mid=options.ndense)
 
-		mid=encode_model(projs)##allgrds[:bsz]##########################################
+		mid=encode_model(allgrds[:bsz])############################################ projs
 		print("Latent space shape: ", mid.shape)
 		out=decode_model(mid)
 		print("Output shape: ",out.shape)
@@ -1104,7 +1098,7 @@ def main():
 		
 		#### actual training
 		ptclidx=allscr>-1
-		trainset=tf.data.Dataset.from_tensor_slices((projs[:], dcpx[0][:], dcpx[1][:], xfsnp[:]))#######allgrds[ptclidx]
+		trainset=tf.data.Dataset.from_tensor_slices((allgrds[ptclidx], dcpx[0][ptclidx], dcpx[1][ptclidx], xfsnp[ptclidx]))#########################projs[:], dcpx[0][:], dcpx[1][:], xfsnp[:]
 		trainset=trainset.batch(bsz)
 		
 		train_heterg(trainset, pts, encode_model, decode_model, params, options)
@@ -1118,7 +1112,7 @@ def main():
 			print("Encoder saved as ",options.encoderout)
 		
 		## conformation output
-		mid=calc_conf(encode_model, projs[:], 1000)#######allgrds[ptclidx]
+		mid=calc_conf(encode_model, allgrds[ptclidx] , 1000)##################################projs[:]
 		
 		if options.midout:
 			sv=np.hstack([np.where(ptclidx)[0][:,None], mid])
