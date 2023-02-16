@@ -880,7 +880,7 @@ def main():
 	parser.add_argument("--ndense", type=int,help="size of the layers between the middle and in/out, variable if -1. Default 512", default=512)
 	parser.add_argument("--mask", type=str,help="remove points outside mask", default="")
 	parser.add_argument("--ppid", type=int, help="Set the PID of the parent process, used for cross platform PPID",default=-1)
-	parser.add_argument(“--q”, action="store_true", default=False ,help=" q-Gaussian ")
+	parser.add_argument("--q", action="store_true", default=False ,help=" q-Gaussian ")
 
 	(options, args) = parser.parse_args()
 	logid=E2init(sys.argv,options.ppid)
