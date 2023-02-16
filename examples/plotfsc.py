@@ -59,7 +59,7 @@ for i,f in enumerate(fscs):
 				lastres=d[0][si]*(1.0-frac)+d[0][si-1]*frac
 				try:
 					plt.annotate(r"{:1.1f} $\AA$".format(old_div(1.0,lastres)),xy=(lastres,0.143),
-						xytext=(old_div((lastres*4+d[0][-1]),5.0),0.2),arrowprops={"width":1,"frac":.1,"headwidth":7,"shrink":.05})
+						xytext=(old_div((lastres*4+d[0][-1]),5.0),0.2),arrowprops={"width":1,"headlength":.1,"headwidth":7,"shrink":.05}) #frac
 				except: pass
 				break
 		else : lastres=0
