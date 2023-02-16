@@ -121,7 +121,7 @@ def xf2pts(pts, ang):
 ##                 but the dynamic range of values in Fourier space can sometimes be too high...
 ##           sym - symmetry string
 #@tf.function
-def pts2img(pts, ang, params, lp=.1, sym="c1"):
+def pts2img(pts, ang, params, lp=.1, sym="c1",options):
 	bsz=ang.shape[0]
 	sz, idxft, rrft=params["sz"], params["idxft"], params["rrft"]
 	
@@ -158,13 +158,14 @@ def pts2img(pts, ang, params, lp=.1, sym="c1"):
 		bamp0=tf.nn.relu(bamp[:, :,None, None])
 		bsigma0=tf.nn.relu(bsigma[:,:,None, None])
 		
-		###qgaussian
-		q = 0.999
-		e=tf.pow((1+(1-q)*(-rrft*lp*bsigma0)),(1/(1-q)))
-		amp = e*bamp0
+		##qgaussian#################
+		if options.q:
+			q = 0.999
+			e=tf.pow((1+(1-q)*(-rrft*lp*bsigma0)),(1/(1-q)))
+			amp = e*bamp0
+		else:
+			amp=tf.exp(-rrft*lp*bsigma0)*bamp0
 		
-		#amp=tf.exp(-rrft*lp*bsigma0)*bamp0###################
-
 		pgauss_real=tf.cos(cpxang)*amp
 		pgauss_imag=-tf.sin(cpxang)*amp
 		
@@ -497,7 +498,7 @@ def train_decoder(gen_model, trainset, params, options, pts=None):
 				else: conf=tf.zeros((xf.shape[0],options.nmid), dtype=floattype)
 				pout=gen_model(conf)
 				std=tf.reduce_mean(tf.math.reduce_std(pout, axis=1), axis=0)
-				imgs_cpx=pts2img(pout, xf, params, sym=options.sym)
+				imgs_cpx=pts2img(pout, xf, params, sym=options.sym, options)
 				fval=calc_frc(pj_cpx, imgs_cpx, params["rings"])
 				loss=-tf.reduce_mean(fval)
 #				l=loss+std[4]*options.sigmareg+std[3]*5*(options.niter-itr)/options.niter
@@ -540,7 +541,7 @@ def eval_model(gen_model, options):
 	for xf in trainset:
 		conf=tf.zeros((xf.shape[0],options.nmid), dtype=floattype)
 		pout=gen_model(conf)
-		imgs_real, imgs_imag=pts2img(pout, xf, params, sym=options.sym)
+		imgs_real, imgs_imag=pts2img(pout, xf, params, sym=options.sym, options)
 		imgs_cpx=tf.complex(imgs_real, imgs_imag)
 		imgs_out=tf.signal.irfft2d(imgs_cpx)
 		imgs.append(imgs_out)
@@ -606,7 +607,7 @@ def coarse_align(dcpx, pts, options):
 	niter=len(xfsnp)//bsz
 	for ii in range(niter):
 		xx=xfsnp[ii*bsz:(ii+1)*bsz]
-		projs_cpx=pts2img(pts, xx, sym=options.sym)
+		projs_cpx=pts2img(pts, xx, sym=options.sym, options)
 		
 		for idt in range(npt):
 			dc=list(tf.repeat(d[idt:idt+1], len(xx), axis=0) for d in dcpx)
@@ -652,7 +653,7 @@ def refine_align(dcpx, xfsnp, pts, options, lr=1e-3):
 			with tf.GradientTape() as gt:
 				#xv=tf.concat([xf[:,:3], xfvar[:,3:]], axis=1)
 				xv=xfvar
-				proj_cpx=pts2img(p, xv, sym=options.sym)
+				proj_cpx=pts2img(p, xv, sym=options.sym, options)
 				fval=calc_frc(proj_cpx, ptcl_cpx)
 				loss=-tf.reduce_mean(fval)
 
@@ -713,7 +714,7 @@ def calc_gradient(trainset, pts, params, options):
 		with tf.GradientTape() as gt:
 			pt=tf.Variable(tf.repeat(pts, xf.shape[0], axis=0))
 			
-			imgs_cpx=pts2img(pt, xf, params, sym=options.sym)
+			imgs_cpx=pts2img(pt, xf, params, sym=options.sym, options)
 			fval=calc_frc(pj_cpx, imgs_cpx, params["rings"])
 			
 			loss=-tf.reduce_mean(fval)
@@ -784,7 +785,7 @@ def train_heterg(trainset, pts, encode_model, decode_model, params, options):
 				pout=poutt*pas+p0*(1-pas)
 				
 				## finally generate images and calculate frc
-				imgs_cpx=pts2img(pout, xf, params, sym=options.sym)
+				imgs_cpx=pts2img(pout, xf, params, sym=options.sym, options)
 				fval=calc_frc(pj_cpx, imgs_cpx, params["rings"])
 				loss=-tf.reduce_mean(fval)+cl*1e-2##########################################
 				
@@ -879,6 +880,7 @@ def main():
 	parser.add_argument("--ndense", type=int,help="size of the layers between the middle and in/out, variable if -1. Default 512", default=512)
 	parser.add_argument("--mask", type=str,help="remove points outside mask", default="")
 	parser.add_argument("--ppid", type=int, help="Set the PID of the parent process, used for cross platform PPID",default=-1)
+	parser.add_argument(“--q”, action="store_true", default=False ,help=" q-Gaussian ")
 
 	(options, args) = parser.parse_args()
 	logid=E2init(sys.argv,options.ppid)
