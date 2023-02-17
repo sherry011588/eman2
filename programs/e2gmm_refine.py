@@ -774,8 +774,8 @@ def train_heterg(trainset, pts, encode_model, decode_model, params, options):
 					conf=encode_model(projs, training=True)
 
 					##add mean log var  ninp=options.nmid 
-					z_mean = tf.keras.layers.Dense(7, name="z_mean")(conf)#options.nmid 8
-					z_log_var = tf.keras.layers.Dense(7, name="z_log_var")(conf)#options.nmid 8
+					z_mean = tf.keras.layers.Dense(options.nmid, name="z_mean")(conf)#options.nmid 8
+					z_log_var = tf.keras.layers.Dense(options.nmid, name="z_log_var")(conf)#options.nmid 8
 					conf = Sampling()([z_mean, z_log_var])
 
 					conf=options.perturb*tf.random.normal(conf.shape)+conf
