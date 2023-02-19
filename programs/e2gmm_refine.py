@@ -160,10 +160,9 @@ def pts2img(pts, ang, params,options, lp=.1, sym="c1"):
 		
 		##qgaussian#################
 		if options.q:
-			q = 0.999
+			q = 0.99999
 			e=tf.pow((1+(1-q)*(-rrft*lp*bsigma0)),(1/(1-q)))
 			amp = e*bamp0
-			print("use q-Gaussian")
 		else:
 			amp=tf.exp(-rrft*lp*bsigma0)*bamp0
 		
