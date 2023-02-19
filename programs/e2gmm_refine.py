@@ -163,6 +163,7 @@ def pts2img(pts, ang, params,options, lp=.1, sym="c1"):
 			q = 0.999
 			e=tf.pow((1+(1-q)*(-rrft*lp*bsigma0)),(1/(1-q)))
 			amp = e*bamp0
+			print("use q-Gaussian")
 		else:
 			amp=tf.exp(-rrft*lp*bsigma0)*bamp0
 		
@@ -340,6 +341,7 @@ def build_encoder(options,mid=512, nout=4, conv=False, ninp=-1):
 
 	if options.vae:
 		kinit=tf.keras.initializers.HeNormal()
+		print("use HeNormal initializers (encoder)")
 	else:
 		kinit=tf.keras.initializers.RandomNormal(0,0.001)	# was 0.01
 	
@@ -356,6 +358,7 @@ def build_encoder(options,mid=512, nout=4, conv=False, ninp=-1):
 			tf.keras.layers.BatchNormalization(),
 			tf.keras.layers.Dense(nout, kernel_initializer=kinit),
 			]
+			print("use vae layers")
 
 		else:
 			ss=64
@@ -420,6 +423,7 @@ def build_decoder(options,pts, mid=512, ninp=4, conv=False):
 	
 	if options.vae:
 		kinit=tf.keras.initializers.HeNormal()
+		print("use HeNormal initializers (decoder)")
 	else:
 		kinit=tf.keras.initializers.RandomNormal(0,1e-2)
 	l2=tf.keras.regularizers.l2(1e-3)
@@ -805,6 +809,7 @@ def train_heterg(trainset, pts, encode_model, decode_model, params, options):
 					sys.stdout.write("\r {}/{}\t{:.3f}         ".format(len(cost), nbatch, loss))
 					sys.stdout.flush()
 
+			print("use Sampling")
 
 		else:
 			for grd,pjr,pji,xf in trainset:   
@@ -1138,6 +1143,7 @@ def main():
 
 		if options.vae:
 			mid=encode_model(projs)
+			print("use vae mid")
 		else:
 			mid=encode_model(allgrds[:bsz])
 		print("Latent space shape: ", mid.shape)
@@ -1149,6 +1155,7 @@ def main():
 		ptclidx=allscr>-1
 		if options.vae:
 			trainset=tf.data.Dataset.from_tensor_slices((projs[:], dcpx[0][:], dcpx[1][:], xfsnp[:]))
+			print("use vae trainset")
 		else:
 			trainset=tf.data.Dataset.from_tensor_slices((allgrds[ptclidx], dcpx[0][ptclidx], dcpx[1][ptclidx], xfsnp[ptclidx]))
 		trainset=trainset.batch(bsz)
@@ -1166,6 +1173,7 @@ def main():
 		## conformation output
 		if options.vae:
 			mid=calc_conf(encode_model, projs[:] , 1000)
+			print("use vae mid (conformation output)")
 		else:
 			mid=calc_conf(encode_model, allgrds[ptclidx] , 1000)
 		
