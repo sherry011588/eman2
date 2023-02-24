@@ -64,7 +64,8 @@ for i,f in enumerate(fscs):
 				break
 		else : lastres=0
 
-
+print("frac:", frac)
+print("lastres:", lastres)
 plt.axhline(0.0,color="k")
 plt.axhline(0.143,color="#306030",linestyle=":")
 plt.axis((0,maxx,-.02,1.02))
