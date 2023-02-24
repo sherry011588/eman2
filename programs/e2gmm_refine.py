@@ -936,6 +936,7 @@ def main():
 	print('conv : ', options.conv)
 	print('learnrate : ', options. learnrate)
 	print('nmid : ', options. nmid)
+	print('niter : ', options. niter)
 	
 	## load GMM from text file
 	if options.model:
