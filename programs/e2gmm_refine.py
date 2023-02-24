@@ -932,6 +932,11 @@ def main():
 	gen_model=None
 	maxboxsz=options.maxboxsz
 	
+	print('pas : ', options.pas)
+	print('conv : ', options.conv)
+	print('learnrate : ', options. learnrate)
+	print('nmid : ', options. nmid)
+	
 	## load GMM from text file
 	if options.model:
 		if options.model.endswith(".pdb"):
