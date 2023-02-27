@@ -956,7 +956,7 @@ def main():
 			
 			pts=np.loadtxt(options.model).astype(floattype)
 		npt=len(pts)
-		print("{} gaussian in the model".format(len(pts)))
+		print("first {} gaussian in the model".format(len(pts)))
 	else:
 		pts=None
 	
@@ -976,7 +976,7 @@ def main():
 		## randomize it a bit so we dont have all zero weights
 		rnd=np.random.randn(pts.shape[0], pts.shape[1])*1e-3
 		gen_model=build_decoder(options,pts+rnd, ninp=options.nmid, conv=options.conv,mid=options.ndense)
-		print("{} gaussian in the model".format(len(pts)))
+		print("second {} gaussian in the model".format(len(pts)))
 		
 		
 		
