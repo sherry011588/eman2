@@ -925,6 +925,7 @@ def main():
 	parser.add_argument("--ppid", type=int, help="Set the PID of the parent process, used for cross platform PPID",default=-1)
 	parser.add_argument("--q", action="store_true", default=False ,help=" q-Gaussian ")
 	parser.add_argument("--vae" , action="store_true", default=False ,help=" vae ")
+	parser.add_argument("--dim" , action="store_true", default=False ,help=" dim ")
 
 	(options, args) = parser.parse_args()
 	logid=E2init(sys.argv,options.ppid)
@@ -937,6 +938,12 @@ def main():
 	print('learnrate : ', options. learnrate)
 	print('nmid : ', options. nmid)
 	print('niter : ', options. niter)
+
+	if options.dim:
+		print('dim : ', options. dim)
+	else:
+		print('dim : ', options. dim)
+
 	
 	## load GMM from text file
 	if options.model:
