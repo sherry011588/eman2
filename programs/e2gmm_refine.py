@@ -160,8 +160,7 @@ def pts2img(pts, ang, params,options, lp=.1, sym="c1"):
 		
 		##qgaussian#################
 		if options.q:
-			q = 0.999
-			e=tf.pow((1+(1-q)*(-rrft*lp*bsigma0)),(1/(1-q)))
+			e=tf.pow((1+(1-options.qnum)*(-rrft*lp*bsigma0)),(1/(1-options.qnum)))
 			amp = e*bamp0
 		else:
 			amp=tf.exp(-rrft*lp*bsigma0)*bamp0
@@ -924,6 +923,7 @@ def main():
 	parser.add_argument("--mask", type=str,help="remove points outside mask", default="")
 	parser.add_argument("--ppid", type=int, help="Set the PID of the parent process, used for cross platform PPID",default=-1)
 	parser.add_argument("--q", action="store_true", default=False ,help=" q-Gaussian ")
+	parser.add_argument("--qnum", type=float,help="q-Gaussian number. ", default=0.999)
 	parser.add_argument("--vae" , action="store_true", default=False ,help=" vae ")
 	parser.add_argument("--dim" , action="store_true", default=False ,help=" dim ")
 
@@ -938,6 +938,7 @@ def main():
 	print('learnrate : ', options. learnrate)
 	print('nmid : ', options. nmid)
 	print('niter : ', options. niter)
+	print('qnum : ', options. qnum)
 
 	if options.dim:
 		print('dim : ', options. dim)
