@@ -753,7 +753,8 @@ def train_heterg(trainset, pts, encode_model, decode_model, params, options):
 	pas=tf.constant(np.array([pas[0],pas[0],pas[0],pas[1],pas[2]], dtype=floattype))
 	
 	## initialize optimizer
-	opt=tf.keras.optimizers.Adam(learning_rate=options.learnrate)
+	lr_schedule = keras.optimizers.schedules.ExponentialDecay(initial_learning_rate=1e-3,decay_steps=500000,decay_rate=0.794328)
+	opt=tf.keras.optimizers.Adam(learning_rate= lr_schedule)#options.learnrate
 	wts=encode_model.trainable_variables + decode_model.trainable_variables
 	nbatch=0
 	for t in trainset: nbatch+=1
