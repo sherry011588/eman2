@@ -928,7 +928,7 @@ def main():
 	parser.add_argument("--qnum", type=float,help="q-Gaussian number. ", default=0.999)
 	parser.add_argument("--vae" , action="store_true", default=False ,help=" vae ")
 	parser.add_argument("--initiallr", type=float,help="ExponentialDecay initial_learning_rate", default=0.001)
-	parser.add_argument("--ds", type=float,help="ExponentialDecay decay_steps", default=10000)
+	parser.add_argument("--ds", type=int,help="ExponentialDecay decay_steps", default=10000)
 	parser.add_argument("--dr", type=float,help="ExponentialDecay decay_rate", default=0.1)
 
 	(options, args) = parser.parse_args()
