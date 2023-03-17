@@ -493,7 +493,7 @@ def build_decoder(options,pts, mid=512, ninp=4, conv=False):
 #### training decoder on projections
 def train_decoder(gen_model, trainset, params, options, pts=None):
 	"""pts input can optionally be used as a regularizer if they are known to be good"""
-	lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(initial_learning_rate=1e-3,decay_steps=40000,decay_rate=0.1)
+	lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(initial_learning_rate=options.initiallr,decay_steps=options.ds,decay_rate=options.dr)
 	opt=tf.keras.optimizers.Adam(learning_rate= lr_schedule) #options.learnrate
 	wts=gen_model.trainable_variables
 	
@@ -754,7 +754,7 @@ def train_heterg(trainset, pts, encode_model, decode_model, params, options):
 	pas=tf.constant(np.array([pas[0],pas[0],pas[0],pas[1],pas[2]], dtype=floattype))
 	
 	## initialize optimizer
-	lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(initial_learning_rate=1e-3,decay_steps=40000,decay_rate=0.1)
+	lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(initial_learning_rate=options.initiallr,decay_steps=options.ds,decay_rate=options.dr)
 	opt=tf.keras.optimizers.Adam(learning_rate= lr_schedule)#options.learnrate
 	wts=encode_model.trainable_variables + decode_model.trainable_variables
 	nbatch=0
@@ -927,6 +927,9 @@ def main():
 	parser.add_argument("--q", action="store_true", default=False ,help=" q-Gaussian ")
 	parser.add_argument("--qnum", type=float,help="q-Gaussian number. ", default=0.999)
 	parser.add_argument("--vae" , action="store_true", default=False ,help=" vae ")
+	parser.add_argument("--initiallr", type=float,help="ExponentialDecay initial_learning_rate", default=0.001)
+	parser.add_argument("--ds", type=float,help="ExponentialDecay decay_steps", default=10000)
+	parser.add_argument("--dr", type=float,help="ExponentialDecay decay_rate", default=0.1)
 
 	(options, args) = parser.parse_args()
 	logid=E2init(sys.argv,options.ppid)
@@ -940,6 +943,9 @@ def main():
 	print('nmid : ', options. nmid)
 	print('niter : ', options. niter)
 	print('qnum : ', options. qnum)
+	print('initiallr : ', options. initiallr)
+	print('ds : ', options. ds)
+	print('dr : ', options. dr)
 	
 	## load GMM from text file
 	if options.model:
