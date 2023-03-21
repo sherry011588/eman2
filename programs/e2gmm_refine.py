@@ -500,7 +500,7 @@ def train_decoder(gen_model, trainset, params, options, pts=None):
     scale_fn=lambda x: 1/(2.**(x-1)),
     step_size=5* 1563
 )
-	opt=tf.keras.optimizers.Adam(learning_rate=clr ) #options.learnrate lr_schedule
+	opt=tf.keras.optimizers.Adam(learning_rate=lr_schedule ) #options.learnrate clr
 	wts=gen_model.trainable_variables
 	
 	nbatch=0
@@ -764,9 +764,8 @@ def train_heterg(trainset, pts, encode_model, decode_model, params, options):
 	clr = tfa.optimizers.CyclicalLearningRate(initial_learning_rate=1e-3,
     maximal_learning_rate=1e-6,
     scale_fn=lambda x: 1/(2.**(x-1)),
-    step_size=5* 1563
-)
-	opt=tf.keras.optimizers.Adam(learning_rate=clr )# options.learnrate lr_schedule
+    step_size=5* 1563)
+	opt=tf.keras.optimizers.Adam(learning_rate=lr_schedule )# options.learnrate clr
 	wts=encode_model.trainable_variables + decode_model.trainable_variables
 	nbatch=0
 	for t in trainset: nbatch+=1
