@@ -2,6 +2,7 @@
 # Muyuan Chen 2020-06
 from EMAN2 import *
 import numpy as np
+import tensorflow_addons as tfa
 from sklearn.decomposition import PCA
 from EMAN2_utils import pdb2numpy
 from scipy.stats import genpareto
@@ -494,7 +495,12 @@ def build_decoder(options,pts, mid=512, ninp=4, conv=False):
 def train_decoder(gen_model, trainset, params, options, pts=None):
 	"""pts input can optionally be used as a regularizer if they are known to be good"""
 	lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(initial_learning_rate=options.initiallr,decay_steps=options.ds,decay_rate=options.dr)
-	opt=tf.keras.optimizers.Adam(learning_rate= lr_schedule ) #options.learnrate
+	clr = tfa.optimizers.CyclicalLearningRate(initial_learning_rate=1e-3,
+    maximal_learning_rate=1e-6,
+    scale_fn=lambda x: 1/(2.**(x-1)),
+    step_size=10* 1563
+)
+	opt=tf.keras.optimizers.Adam(learning_rate=clr ) #options.learnrate lr_schedule
 	wts=gen_model.trainable_variables
 	
 	nbatch=0
@@ -755,7 +761,12 @@ def train_heterg(trainset, pts, encode_model, decode_model, params, options):
 	
 	## initialize optimizer
 	lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(initial_learning_rate=options.initiallr,decay_steps=options.ds,decay_rate=options.dr)
-	opt=tf.keras.optimizers.Adam(learning_rate= lr_schedule)# options.learnrate
+	clr = tfa.optimizers.CyclicalLearningRate(initial_learning_rate=1e-3,
+    maximal_learning_rate=1e-6,
+    scale_fn=lambda x: 1/(2.**(x-1)),
+    step_size=10* 1563
+)
+	opt=tf.keras.optimizers.Adam(learning_rate=clr )# options.learnrate lr_schedule
 	wts=encode_model.trainable_variables + decode_model.trainable_variables
 	nbatch=0
 	for t in trainset: nbatch+=1
