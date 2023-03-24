@@ -859,8 +859,8 @@ def train_heterg(trainset, pts, encode_model, decode_model, params, options):
 			
 		sys.stdout.write("\r")
 		
-		print("iter {}, loss : {:.4f}".format(itr, np.mean(cost)))
-		allcost.append(np.mean(cost),opt.lr)
+		print("iter {}, loss : {:.4f}".format(itr, np.mean(cost)),opt.lr)
+		allcost.append(np.mean(cost))
 		
 	return allcost
 	
