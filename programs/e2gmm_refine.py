@@ -612,7 +612,7 @@ def train_decoder(gen_model, trainset, params, options, pts=None):
 			sys.stdout.flush()
 		sys.stdout.write("\r")
 		
-		print("iter {}, loss : {:.4f} ({:.4f})         ".format(itr, np.mean(cost), np.mean(truecost)),opt.lr.numpy())
+		print("iter {}, loss : {:.4f} ({:.4f})         ".format(itr, np.mean(cost), np.mean(truecost)),opt.lr)#.numpy()
 
 def eval_model(gen_model, options):
 	
@@ -936,7 +936,7 @@ def train_heterg(trainset, pts, encode_model, decode_model, params, options):
 			
 		sys.stdout.write("\r")
 		
-		print("iter {}, loss : {:.4f}".format(itr, np.mean(cost)),opt.lr.numpy())
+		print("iter {}, loss : {:.4f}".format(itr, np.mean(cost)),opt.lr)#.numpy()
 		allcost.append(np.mean(cost))
 		
 	return allcost
