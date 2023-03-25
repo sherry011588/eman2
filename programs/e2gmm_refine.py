@@ -6,7 +6,7 @@ import tensorflow_addons as tfa
 from sklearn.decomposition import PCA
 from EMAN2_utils import pdb2numpy
 from scipy.stats import genpareto
-from one_cycle_adamw import OneCycleAdamW
+from one_cycle_adamw.py import OneCycleAdamW
 
 #### need to unify the float type across tenforflow and numpy
 ##   in theory float16 also works but it can be unsafe especially when the network is deeper...
