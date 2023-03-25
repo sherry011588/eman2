@@ -494,7 +494,7 @@ def build_decoder(options,pts, mid=512, ninp=4, conv=False):
 #### training decoder on projections
 def train_decoder(gen_model, trainset, params, options, pts=None):
 	"""pts input can optionally be used as a regularizer if they are known to be good"""
-	#lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(initial_learning_rate=options.initiallr,decay_steps=options.ds,decay_rate=options.dr)
+	lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(initial_learning_rate=options.initiallr,decay_steps=options.ds,decay_rate=options.dr)
 	opt=tf.keras.optimizers.Adam(learning_rate=lr_schedule ) #options.learnrate
 
 	wts=gen_model.trainable_variables
@@ -756,7 +756,7 @@ def train_heterg(trainset, pts, encode_model, decode_model, params, options):
 	pas=tf.constant(np.array([pas[0],pas[0],pas[0],pas[1],pas[2]], dtype=floattype))
 	
 	## initialize optimizer
-	#lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(initial_learning_rate=options.initiallr,decay_steps=options.ds,decay_rate=options.dr)
+	lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(initial_learning_rate=options.initiallr,decay_steps=options.ds,decay_rate=options.dr)
 	opt=tf.keras.optimizers.Adam(learning_rate=lr_schedule )# options.learnrate
 
 	wts=encode_model.trainable_variables + decode_model.trainable_variables
