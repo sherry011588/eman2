@@ -238,7 +238,7 @@ def pts2img(pts, ang, params,options, lp=.1, sym="c1"):
 		
 		##qgaussian#################
 		if options.q:
-			e=tf.pow((1+(1-options.qnum)*(-rrft*lp*bsigma0)),(1/(1-options.qnum)))
+			e=tf.math.maximum(1+(1-options.qnum)*(-rrft*lp*bsigma0), 0) 
 			amp = e*bamp0
 		else:
 			amp=tf.exp(-rrft*lp*bsigma0)*bamp0
