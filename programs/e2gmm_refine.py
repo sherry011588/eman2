@@ -572,8 +572,12 @@ def build_decoder(options,pts, mid=512, ninp=4, conv=False):
 def train_decoder(gen_model, trainset, params, options, pts=None):
 	"""pts input can optionally be used as a regularizer if they are known to be good"""
 	#lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(initial_learning_rate=options.initiallr,decay_steps=options.ds,decay_rate=options.dr)
-	#opt=tf.keras.optimizers.Adam(learning_rate=lr_schedule ) #options.learnrate
-	opt=OneCycleAdamW(options.lr, options.wd, options.cl)
+	
+	if options.oca:
+		opt=OneCycleAdamW(options.lr, options.wd, options.cl)
+	else:
+		opt=tf.keras.optimizers.Adam(learning_rate=options.learnrate) #lr_schedule
+
 	wts=gen_model.trainable_variables
 	
 	nbatch=0
@@ -834,8 +838,12 @@ def train_heterg(trainset, pts, encode_model, decode_model, params, options):
 	
 	## initialize optimizer
 	#lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(initial_learning_rate=options.initiallr,decay_steps=options.ds,decay_rate=options.dr)
-	#opt=tf.keras.optimizers.Adam(learning_rate=lr_schedule )# options.learnrate
-	opt=OneCycleAdamW(options.lr, options.wd, options.cl)
+
+	if options.oca:
+		opt=OneCycleAdamW(options.lr, options.wd, options.cl)
+	else:
+		opt=tf.keras.optimizers.Adam(learning_rate=options.learnrate) #lr_schedule
+
 	wts=encode_model.trainable_variables + decode_model.trainable_variables
 	nbatch=0
 	for t in trainset: nbatch+=1
@@ -1013,6 +1021,7 @@ def main():
 	parser.add_argument("--lr", type=float,help="OneCycleAdamW learning_rate", default=0.003)
 	parser.add_argument("--wd", type=float,help="OneCycleAdamW weight_decay", default=0.0003)
 	parser.add_argument("--cl", type=int,help="OneCycleAdamW cycle_length", default=14000)
+	parser.add_argument("--oca", action="store_true", default=False ,help=" choose OneCycleAdamW ")
 
 	(options, args) = parser.parse_args()
 	logid=E2init(sys.argv,options.ppid)
