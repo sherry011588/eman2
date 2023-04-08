@@ -461,6 +461,7 @@ def build_encoder(options,mid=512, nout=4, conv=False, ninp=-1):
 		tf.keras.layers.BatchNormalization(),
 		tf.keras.layers.Dense(nout, kernel_regularizer=l2, kernel_initializer=kinit),
 		]
+		print("use 2 layers")
 	else:
 		print(f"Encoder {max(ninp//2,nout)} {max(ninp//8,nout)} {max(ninp//32,nout)}")
 		layers=[
@@ -476,6 +477,7 @@ def build_encoder(options,mid=512, nout=4, conv=False, ninp=-1):
 		tf.keras.layers.BatchNormalization(),
 		tf.keras.layers.Dense(nout, kernel_regularizer=l2, kernel_initializer=kinit,use_bias=True),
 		]
+		print("use 3 layers")
 		
 	encode_model=tf.keras.Sequential(layers)
 	return encode_model
