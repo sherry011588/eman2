@@ -463,21 +463,35 @@ def build_encoder(options,mid=512, nout=4, conv=False, ninp=-1):
 		]
 		print("use 2 layers")
 	else:
-		print(f"Encoder {max(ninp//2,nout)} {max(ninp//8,nout)} {max(ninp//32,nout)}")
-		layers=[
-		tf.keras.layers.Flatten(),
-		tf.keras.layers.Dense(max(ninp//2,nout*2), activation="relu", kernel_regularizer=l2,use_bias=True,bias_initializer=kinit),
-		tf.keras.layers.Dropout(.3),
-		tf.keras.layers.Dense(max(ninp//8,nout*2), activation="relu", kernel_regularizer=l2,use_bias=True),
-		tf.keras.layers.Dense(max(ninp//32,nout*2), activation="relu", kernel_regularizer=l2,use_bias=True),
-		#tf.keras.layers.Dense(max(ninp//2,nout*2), activation="tanh", kernel_regularizer=l1,use_bias=True,bias_initializer=kinit),
-		#tf.keras.layers.Dropout(.3),
-		#tf.keras.layers.Dense(max(ninp//8,nout*2), activation="tanh", kernel_regularizer=l1,use_bias=True),
-		#tf.keras.layers.Dense(max(ninp//32,nout*2), activation="tanh", kernel_regularizer=l1,use_bias=True),
-		tf.keras.layers.BatchNormalization(),
-		tf.keras.layers.Dense(nout, kernel_regularizer=l2, kernel_initializer=kinit,use_bias=True),
-		]
-		print("use 3 layers")
+		print(f"Encoder {max(ninp//2,nout)} {max(ninp//8,nout)} {max(ninp//32,nout)}")#774 193 48
+		if options.vae:
+			layers=[
+			tf.keras.layers.InputLayer(input_shape=(48,48,1)),
+			tf.keras.layers.Flatten(),
+			tf.keras.layers.Dense(max(ninp//2,nout*2), activation="relu", kernel_regularizer=l2,use_bias=True,bias_initializer=kinit),
+			tf.keras.layers.Dropout(.3),
+			tf.keras.layers.Dense(max(ninp//8,nout*2), activation="relu", kernel_regularizer=l2,use_bias=True),
+			tf.keras.layers.Dense(max(ninp//32,nout*2), activation="relu", kernel_regularizer=l2,use_bias=True),
+			tf.keras.layers.BatchNormalization(),
+			tf.keras.layers.Dense(nout, kernel_regularizer=l2, kernel_initializer=kinit,use_bias=True),
+			]
+			print("use 3 layers(vae)")
+		else:
+			layers=[
+			tf.keras.layers.Flatten(),
+			tf.keras.layers.Dense(max(ninp//2,nout*2), activation="relu", kernel_regularizer=l2,use_bias=True,bias_initializer=kinit),
+			tf.keras.layers.Dropout(.3),
+			tf.keras.layers.Dense(max(ninp//8,nout*2), activation="relu", kernel_regularizer=l2,use_bias=True),
+			tf.keras.layers.Dense(max(ninp//32,nout*2), activation="relu", kernel_regularizer=l2,use_bias=True),
+			#tf.keras.layers.Dense(max(ninp//2,nout*2), activation="tanh", kernel_regularizer=l1,use_bias=True,bias_initializer=kinit),
+			#tf.keras.layers.Dropout(.3),
+			#tf.keras.layers.Dense(max(ninp//8,nout*2), activation="tanh", kernel_regularizer=l1,use_bias=True),
+			#tf.keras.layers.Dense(max(ninp//32,nout*2), activation="tanh", kernel_regularizer=l1,use_bias=True),
+			tf.keras.layers.BatchNormalization(),
+			tf.keras.layers.Dense(nout, kernel_regularizer=l2, kernel_initializer=kinit,use_bias=True),
+			]
+			print("use 3 layers")
+
 		
 	encode_model=tf.keras.Sequential(layers)
 	return encode_model
