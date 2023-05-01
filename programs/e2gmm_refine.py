@@ -872,10 +872,10 @@ def train_heterg(trainset, pts, encode_model, decode_model, params, options):
 		cost=[]
 
 		if options.vae:
-			for projs,pjr,pji,xf in trainset:
+			for grd,pjr,pji,xf in trainset:
 				pj_cpx=(pjr, pji)
 				with tf.GradientTape() as gt:
-					conf=encode_model(projs, training=True)
+					conf=encode_model(grd, training=True)
 
 					##add mean log var  ninp=options.nmid 
 					z_mean = tf.keras.layers.Dense(options.nmid, name="z_mean")(conf)#options.nmid 8
