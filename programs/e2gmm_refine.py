@@ -415,8 +415,8 @@ def build_encoder(options,mid=512, nout=4, conv=False, ninp=-1):
 	l2=tf.keras.regularizers.l2(1e-3)
 	l1=tf.keras.regularizers.l1(1e-3)
 
-	#kinit=tf.keras.initializers.HeNormal()
-	kinit=tf.keras.initializers.RandomNormal(0,0.001)	# was 0.01
+	kinit=tf.keras.initializers.HeNormal()
+	#kinit=tf.keras.initializers.RandomNormal(0,0.001)	# was 0.01
 	
 	if conv:
 		if options.vae:
@@ -511,8 +511,8 @@ def build_decoder(options,pts, mid=512, ninp=4, conv=False):
 	x0=tf.keras.Input(shape=(ninp))
 	
 
-	#kinit=tf.keras.initializers.HeNormal()
-	kinit=tf.keras.initializers.RandomNormal(0,1e-2)
+	kinit=tf.keras.initializers.HeNormal()
+	#kinit=tf.keras.initializers.RandomNormal(0,1e-2)
 
 	l2=tf.keras.regularizers.l2(1e-3)
 	l1=tf.keras.regularizers.l1(1e-3)
