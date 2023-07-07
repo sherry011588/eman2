@@ -3,13 +3,13 @@
 from EMAN2 import *
 import numpy as np
 import tensorflow as tf
-#import tensorflow_addons as tfa
+import tensorflow_addons as tfa
 from sklearn.decomposition import PCA
 from EMAN2_utils import pdb2numpy
 from scipy.stats import genpareto
 
 
-class OneCycleAdamW(tf.keras.optimizers.AdamW): #tfa.
+class OneCycleAdamW(tfa.optimizers.AdamW): #tfa.tf.keras.
 	def __init__(self, learning_rate, weight_decay, cycle_length):
 		self.one_cycle_schedule = OneCycleSchedule(cycle_length)
 
